@@ -25,7 +25,13 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-parser" % circeVersion,
   "de.heikoseeberger" %% "akka-http-circe" % "1.21.0",
 
-  "org.scalatest" %% "scalatest" % "3.0.5" % Test
+  "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+
+  "org.apache.logging.log4j" %% "log4j-api-scala" % "11.0",
+  "org.apache.logging.log4j" % "log4j-api" % "2.11.0",
+  "org.apache.logging.log4j" % "log4j-core" % "2.11.0" % Runtime,
+
+  "com.typesafe.akka" %% "akka-slf4j"      % akkaVersion
 )
 
 mainClass in Global := Some("com.giftedprimate.Main")
