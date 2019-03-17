@@ -11,6 +11,7 @@ val akkaVersion = "2.5.13"
 val akkaHttpVersion = "10.1.3"
 val circeVersion = "0.9.3"
 val macwireVersion = "2.3.2"
+val bitcoinjVersion = "0.15"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
@@ -31,7 +32,9 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-api" % "2.11.0",
   "org.apache.logging.log4j" % "log4j-core" % "2.11.0" % Runtime,
 
-  "com.typesafe.akka" %% "akka-slf4j"      % akkaVersion
+  "com.typesafe.akka" %% "akka-slf4j"      % akkaVersion,
+
+  "org.bitcoinj" % "bitcoinj-core" % bitcoinjVersion % "compile"
 )
 
 mainClass in Global := Some("com.giftedprimate.Main")
