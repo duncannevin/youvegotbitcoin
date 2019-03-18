@@ -3,9 +3,10 @@ package com.giftedprimate
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.ActorMaterializer
 import com.giftedprimate.configuration.{ConfigModule, SystemConfig}
-import com.giftedprimate.loggers.ServerLog
+import com.giftedprimate.loggers.{ServerLog, TransactionLog}
+import com.giftedprimate.notification.NotificationActor
 import com.giftedprimate.server.Server
-import com.giftedprimate.transaction.TransactionActor
+import com.giftedprimate.transaction.{TransactionActor, TransactionControl}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.FiniteDuration
@@ -19,10 +20,16 @@ object Main extends App with SystemConfig {
   // dependencies
   val config = new ConfigModule
   val serverLog: ServerLog = new ServerLog(config)
+  val transactionLog: TransactionLog = new TransactionLog
+  val transactionControl =
+    new TransactionControl(config, notificationActor, transactionLog)
 
   // actors
   def transactionActor: ActorRef =
-    system.actorOf(TransactionActor.props(config), "transaction-actor")
+    system.actorOf(TransactionActor.props(config, transactionControl),
+                   "transaction-actor")
+  def notificationActor: ActorRef =
+    system.actorOf(NotificationActor.props, "notification-actor")
 
   val server: Server = new Server(config, transactionActor)
   val binding = server.bind()
