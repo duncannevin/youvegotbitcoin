@@ -2,9 +2,8 @@ package com.giftedprimate.transaction
 
 import com.giftedprimate.configuration.{ConfigModule, SystemConfig}
 import com.giftedprimate.loggers.TransactionLog
-import org.bitcoinj.crypto.DeterministicKey
 import org.bitcoinj.script.Script.ScriptType
-import org.bitcoinj.wallet.{DeterministicSeed, Wallet}
+import org.bitcoinj.wallet.Wallet
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -12,6 +12,7 @@ val akkaHttpVersion = "10.1.3"
 val circeVersion = "0.9.3"
 val macwireVersion = "2.3.2"
 val bitcoinjVersion = "0.15"
+val emailAddressVersion = "3.2.0"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,

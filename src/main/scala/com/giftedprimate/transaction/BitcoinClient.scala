@@ -57,7 +57,7 @@ class BitcoinClient(
     (wallet: Wallet, tx: Transaction, prevBalance: Coin, newBalance: Coin) => {
       println(
         s"funds received: {wallet: $wallet, tx: $tx, prevBalance: $prevBalance, newBalance: $newBalance}")
-      // todo -> react to payment
+      // todo -> react to payment -> send email with notification actor
     }
 
   val blockChainDownloadListener: PeerDataEventListener =

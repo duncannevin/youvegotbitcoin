@@ -11,8 +11,7 @@ class TransactionLog extends Logger {
   def unrecognizedMessageSentToActor(): Unit =
     logger.info("unrecognized message sent to actor")
   def watchingWallet(recipientWallet: RecipientWallet): Unit =
-    logger.info(
-      s"watching wallet: ${recipientWallet.publicKey} seed: ${recipientWallet.seed} sendTo: ${recipientWallet.publicKeyAddress}")
+    logger.info(s"watching wallet: ${recipientWallet.publicKey}")
   override def info(msg: String): Unit = ???
   override def warn(msg: String): Unit = ???
   override def debug(msg: String): Unit = ???

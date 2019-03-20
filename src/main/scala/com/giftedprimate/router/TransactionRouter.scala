@@ -2,11 +2,16 @@ package com.giftedprimate.router
 
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
 import com.giftedprimate.configuration.{ConfigModule, SystemConfig}
 import com.giftedprimate.transaction.CreationForm
 import com.giftedprimate.transaction.TransactionActor.CreateWallet
+import com.giftedprimate.validators.{
+  CreateWalletValidator,
+  ValidatorDirectives,
+  WalletDirectives
+}
 
 import scala.concurrent.ExecutionContext
 
@@ -15,21 +20,25 @@ class TransactionRouter(
     transactionActor: ActorRef
 )(implicit ec: ExecutionContext)
     extends PartialRoute
-    with SystemConfig {
+    with SystemConfig
+    with Directives
+    with WalletDirectives
+    with ValidatorDirectives {
 
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import io.circe.generic.auto._
 
-  override def router: Route = pathPrefix("transaction") {
+  override def router: Route = pathPrefix("api") {
     pathEndOrSingleSlash {
-      get {
-        val str = (transactionActor ? "BlaBla").mapTo[String]
-        onSuccess(str)(str => complete((StatusCodes.OK, str)))
-      } ~ post {
+      post {
         entity(as[CreationForm]) { creationForm =>
-          val publicKeyAddress =
-            (transactionActor ? CreateWallet(creationForm)).mapTo[String]
-          onSuccess(publicKeyAddress)(addr => complete(StatusCodes.OK, addr))
+          validateWith(CreateWalletValidator)(creationForm) {
+            handleWithGeneric {
+              (transactionActor ? CreateWallet(creationForm)).mapTo[String]
+            } { publicKeyAddress =>
+              complete(publicKeyAddress)
+            }
+          }
         }
       }
     }
