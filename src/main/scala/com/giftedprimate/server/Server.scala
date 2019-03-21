@@ -7,13 +7,13 @@ import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
-import com.giftedprimate.configuration.ConfigModule
+import com.giftedprimate.configuration.{ConfigModule, ServerConfig}
 import com.giftedprimate.router.Routes
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class Server(
-    config: ConfigModule,
+    config: ServerConfig,
     transactionActor: ActorRef
 )(implicit system: ActorSystem, ec: ExecutionContext, mat: ActorMaterializer) {
 

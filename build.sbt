@@ -13,6 +13,7 @@ val circeVersion = "0.9.3"
 val macwireVersion = "2.3.2"
 val bitcoinjVersion = "0.15"
 val emailAddressVersion = "3.2.0"
+val mongoDriverVersion = "2.4.0"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
@@ -35,7 +36,9 @@ libraryDependencies ++= Seq(
 
   "com.typesafe.akka" %% "akka-slf4j"      % akkaVersion,
 
-  "org.bitcoinj" % "bitcoinj-core" % bitcoinjVersion % "compile"
+  "org.bitcoinj" % "bitcoinj-core" % bitcoinjVersion % "compile",
+
+  "org.mongodb.scala" %% "mongo-scala-driver" % mongoDriverVersion
 )
 
 mainClass in Global := Some("com.giftedprimate.Main")

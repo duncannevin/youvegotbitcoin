@@ -8,7 +8,6 @@ import org.bitcoinj.wallet.Wallet
 import scala.concurrent.{ExecutionContext, Future}
 
 class TransactionControl(
-    config: ConfigModule,
     transactionLog: TransactionLog,
     bitcoinClient: BitcoinClient
 )(

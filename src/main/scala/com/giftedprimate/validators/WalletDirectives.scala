@@ -16,7 +16,4 @@ trait WalletDirectives extends Directives {
         val apiError = e(error)
         complete(apiError.statusCode, apiError.message)
     }
-
-  def handleWithGeneric[T](f: Future[T]): Directive1[T] =
-    handle[T](f)(_ => ApiError.generic)
 }

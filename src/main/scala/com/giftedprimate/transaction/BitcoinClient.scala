@@ -3,7 +3,7 @@ import java.nio.file.Paths
 import java.util
 
 import akka.actor.ActorRef
-import com.giftedprimate.configuration.ConfigModule
+import com.giftedprimate.configuration.{BitcoinConfig, ConfigModule}
 import com.giftedprimate.loggers.TransactionLog
 import org.bitcoinj.core._
 import org.bitcoinj.core.listeners.PeerDataEventListener
@@ -16,7 +16,7 @@ import org.bitcoinj.wallet.listeners.WalletCoinsReceivedEventListener
 
 class BitcoinClient(
     transactionLog: TransactionLog,
-    config: ConfigModule,
+    config: BitcoinConfig,
     notificationActor: ActorRef
 ) {
   object tags {

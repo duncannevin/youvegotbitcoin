@@ -2,7 +2,7 @@ package com.giftedprimate
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.ActorMaterializer
-import com.giftedprimate.configuration.{ConfigModule, SystemConfig}
+import com.giftedprimate.configuration._
 import com.giftedprimate.loggers.{ServerLog, TransactionLog}
 import com.giftedprimate.notification.NotificationActor
 import com.giftedprimate.server.Server
@@ -23,23 +23,25 @@ object Main extends App with SystemConfig {
   implicit val ec: ExecutionContext = ExecutionContext.global
 
   // dependencies
-  val config = new ConfigModule
-  val serverLog: ServerLog = new ServerLog(config)
+  val serverConfig = new ServerConfig
+  val bitcoinConfig = new BitcoinConfig
+  val mongoConfig = new MongoConfig
+  val serverLog: ServerLog = new ServerLog(serverConfig)
   val transactionLog: TransactionLog = new TransactionLog
   val bitcoinClient: BitcoinClient =
-    new BitcoinClient(transactionLog, config, notificationActor)
+    new BitcoinClient(transactionLog, bitcoinConfig, notificationActor)
   val transactionControl =
-    new TransactionControl(config, transactionLog, bitcoinClient)
+    new TransactionControl(transactionLog, bitcoinClient)
 
   // actors
   def transactionActor: ActorRef =
     system.actorOf(
-      TransactionActor.props(config, transactionControl, transactionLog, ec),
+      TransactionActor.props(transactionControl, transactionLog, ec),
       "transaction-actor")
   def notificationActor: ActorRef =
     system.actorOf(NotificationActor.props, "notification-actor")
 
-  val server: Server = new Server(config, transactionActor)
+  val server: Server = new Server(serverConfig, transactionActor)
   val binding = server.bind()
   binding.onComplete {
     case Success(_)     => serverLog.successfulStart

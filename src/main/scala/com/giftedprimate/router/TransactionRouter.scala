@@ -5,6 +5,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
 import com.giftedprimate.configuration.{ConfigModule, SystemConfig}
+import com.giftedprimate.messages.ApiError
 import com.giftedprimate.transaction.CreationForm
 import com.giftedprimate.transaction.TransactionActor.CreateWallet
 import com.giftedprimate.validators.{
@@ -14,6 +15,7 @@ import com.giftedprimate.validators.{
 }
 
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
 class TransactionRouter(
     config: ConfigModule,
@@ -33,10 +35,11 @@ class TransactionRouter(
       post {
         entity(as[CreationForm]) { creationForm =>
           validateWith(CreateWalletValidator)(creationForm) {
-            handleWithGeneric {
-              (transactionActor ? CreateWallet(creationForm)).mapTo[String]
-            } { publicKeyAddress =>
-              complete(publicKeyAddress)
+            val reqPublicKey =
+              (transactionActor ? CreateWallet(creationForm))
+                .mapTo[String]
+            onSuccess(reqPublicKey) { publicKeyAddress =>
+              complete(StatusCodes.OK, publicKeyAddress)
             }
           }
         }

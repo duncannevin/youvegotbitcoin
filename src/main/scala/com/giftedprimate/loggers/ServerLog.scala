@@ -1,7 +1,7 @@
 package com.giftedprimate.loggers
-import com.giftedprimate.configuration.ConfigModule
+import com.giftedprimate.configuration.ServerConfig
 
-class ServerLog(config: ConfigModule) extends Logger {
+class ServerLog(config: ServerConfig) extends Logger {
   def successfulStart: Unit =
     logger.info(s"Emailbitcoin listening on port: ${config.port}")
   def failedStart(msg: String): Unit =
