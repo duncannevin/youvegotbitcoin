@@ -2,6 +2,7 @@ package com.giftedprimate.transaction
 
 import com.giftedprimate.configuration.{ConfigModule, SystemConfig}
 import com.giftedprimate.loggers.TransactionLog
+import com.giftedprimate.models.{CreationForm, RecipientWallet}
 import org.bitcoinj.script.Script.ScriptType
 import org.bitcoinj.wallet.Wallet
 

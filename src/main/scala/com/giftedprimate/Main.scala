@@ -3,7 +3,8 @@ package com.giftedprimate
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.ActorMaterializer
 import com.giftedprimate.configuration._
-import com.giftedprimate.loggers.{ServerLog, TransactionLog}
+import com.giftedprimate.daos.RecipientWalletDAO
+import com.giftedprimate.loggers.{DAOLogger, ServerLog, TransactionLog}
 import com.giftedprimate.notification.NotificationActor
 import com.giftedprimate.server.Server
 import com.giftedprimate.transaction.{
@@ -28,6 +29,7 @@ object Main extends App with SystemConfig {
   val mongoConfig = new MongoConfig
   val serverLog: ServerLog = new ServerLog(serverConfig)
   val transactionLog: TransactionLog = new TransactionLog
+  val recipientWalletDAO = new RecipientWalletDAO(mongoConfig.mongoDb)
   val bitcoinClient: BitcoinClient =
     new BitcoinClient(transactionLog, bitcoinConfig, notificationActor)
   val transactionControl =

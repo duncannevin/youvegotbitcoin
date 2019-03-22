@@ -1,5 +1,5 @@
 package com.giftedprimate.loggers
-import com.giftedprimate.transaction.RecipientWallet
+import com.giftedprimate.models.RecipientWallet
 
 class TransactionLog extends Logger {
   def startingBitcoin(network: String): Unit =

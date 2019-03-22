@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
 import com.giftedprimate.configuration.{ConfigModule, SystemConfig}
 import com.giftedprimate.messages.ApiError
-import com.giftedprimate.transaction.CreationForm
+import com.giftedprimate.models.CreationForm
 import com.giftedprimate.transaction.TransactionActor.CreateWallet
 import com.giftedprimate.validators.{
   CreateWalletValidator,
