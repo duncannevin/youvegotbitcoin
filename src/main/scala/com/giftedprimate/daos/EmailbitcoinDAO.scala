@@ -13,12 +13,11 @@ trait EmailbitcoinDAO[T] {
   val indexKey: String
   val codecRegistry: CodecRegistry
   val collection: MongoCollection[T]
-  val logger: DAOLogger
 
-  def indexCollection(): Unit = {
+  def indexCollection(logger: DAOLogger): Unit = {
     collection.createIndex(ascending(indexKey)).toFuture().onComplete {
-      case Success(_) => logger.indexCreated(indexKey)
-      case Failure(_) => logger.indexFailure(indexKey)
+      case Success(_) => logger.indexCreated(collectionName, indexKey)
+      case Failure(_) => logger.indexFailure(collectionName, indexKey)
     }
   }
 }

@@ -4,8 +4,7 @@ import akka.actor.ActorRef
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
-import com.giftedprimate.configuration.{ConfigModule, SystemConfig}
-import com.giftedprimate.messages.ApiError
+import com.giftedprimate.configuration.SystemConfig
 import com.giftedprimate.models.CreationForm
 import com.giftedprimate.transaction.TransactionActor.CreateWallet
 import com.giftedprimate.validators.{
@@ -13,16 +12,12 @@ import com.giftedprimate.validators.{
   ValidatorDirectives,
   WalletDirectives
 }
+import com.google.inject.Inject
+import com.google.inject.name.Named
 
-import scala.concurrent.ExecutionContext
-import scala.util.{Failure, Success}
-
-class TransactionRouter(
-    config: ConfigModule,
-    transactionActor: ActorRef
-)(implicit ec: ExecutionContext)
-    extends PartialRoute
-    with SystemConfig
+class TransactionRouter @Inject()(
+    @Named("transaction-actor") transactionActor: ActorRef
+) extends PartialRoute
     with Directives
     with WalletDirectives
     with ValidatorDirectives {

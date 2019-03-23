@@ -1,19 +1,19 @@
 package com.giftedprimate.transaction
 
-import com.giftedprimate.configuration.{ConfigModule, SystemConfig}
+import com.giftedprimate.configuration.SystemConfig
 import com.giftedprimate.loggers.TransactionLog
 import com.giftedprimate.models.{CreationForm, RecipientWallet}
+import com.google.inject.Inject
 import org.bitcoinj.script.Script.ScriptType
 import org.bitcoinj.wallet.Wallet
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class TransactionControl(
+class TransactionControl @Inject()(
     transactionLog: TransactionLog,
-    bitcoinClient: BitcoinClient
-)(
-    implicit ec: ExecutionContext
-) extends SystemConfig {
+    bitcoinClient: BitcoinClient,
+    systemConfig: SystemConfig
+) {
   def addWallet(creationForm: CreationForm): Future[RecipientWallet] = {
     val wallet: Wallet =
       Wallet.createDeterministic(bitcoinClient.params, ScriptType.P2PKH)
@@ -24,9 +24,6 @@ class TransactionControl(
     wallet.setAcceptRiskyTransactions(true)
     bitcoinClient.peerGroup.addWallet(wallet)
     transactionLog.watchingWallet(recipientWallet)
-//    for {
-//      _ <- add recipientWallet to db
-//    } yield respond with recipient wallet
     Future.successful(recipientWallet)
   }
 }

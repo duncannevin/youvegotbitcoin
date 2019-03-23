@@ -1,5 +1,3 @@
 package com.giftedprimate.configuration
 
-class BitcoinConfig extends ConfigModule {
-  lazy val network: String = emailbitcoin.bitcoin.network
-}
+case class BitcoinConfig(network: String)

@@ -3,8 +3,10 @@ import java.nio.file.Paths
 import java.util
 
 import akka.actor.ActorRef
-import com.giftedprimate.configuration.{BitcoinConfig, ConfigModule}
+import com.giftedprimate.configuration.BitcoinConfig
 import com.giftedprimate.loggers.TransactionLog
+import com.google.inject.Inject
+import com.google.inject.name.Named
 import org.bitcoinj.core._
 import org.bitcoinj.core.listeners.PeerDataEventListener
 import org.bitcoinj.net.discovery.DnsDiscovery
@@ -14,10 +16,10 @@ import org.bitcoinj.utils.BriefLogFormatter
 import org.bitcoinj.wallet.Wallet
 import org.bitcoinj.wallet.listeners.WalletCoinsReceivedEventListener
 
-class BitcoinClient(
+class BitcoinClient @Inject()(
     transactionLog: TransactionLog,
     config: BitcoinConfig,
-    notificationActor: ActorRef
+    @Named("notification-actor") notificationActor: ActorRef
 ) {
   object tags {
     final val forwardingService = "forwarding-service"

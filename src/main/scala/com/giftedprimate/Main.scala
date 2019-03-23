@@ -1,50 +1,50 @@
 package com.giftedprimate
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.NotUsed
+import akka.actor.ActorSystem
+import akka.http.scaladsl.{Http}
+import akka.http.scaladsl.Http.ServerBinding
+import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.settings.RoutingSettings
 import akka.stream.ActorMaterializer
-import com.giftedprimate.configuration._
-import com.giftedprimate.daos.RecipientWalletDAO
-import com.giftedprimate.loggers.{DAOLogger, ServerLog, TransactionLog}
-import com.giftedprimate.notification.NotificationActor
-import com.giftedprimate.server.Server
-import com.giftedprimate.transaction.{
-  BitcoinClient,
-  TransactionActor,
-  TransactionControl
-}
+import akka.stream.scaladsl.Flow
+import com.giftedprimate.configuration.ServerConfig
+import com.giftedprimate.loggers.ServerLog
+import com.giftedprimate.router.{PartialRoute, TransactionRouter}
+import com.google.inject.{Guice, Inject}
 
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
-object Main extends App with SystemConfig {
-  implicit val system: ActorSystem = ActorSystem("emailbitcoin")
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+object Main extends App {
+  val injector = Guice.createInjector(new Module)
+  implicit val actorSystem: ActorSystem =
+    injector.getInstance(classOf[ActorSystem])
+  implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
+  val transactionRouter = injector.getInstance(classOf[TransactionRouter])
+  val serverLog = injector.getInstance(classOf[ServerLog])
+  val config = injector.getInstance(classOf[ServerConfig])
 
-  implicit val ec: ExecutionContext = ExecutionContext.global
+  implicit val routingSettings: RoutingSettings =
+    RoutingSettings.default
 
-  // dependencies
-  val serverConfig = new ServerConfig
-  val bitcoinConfig = new BitcoinConfig
-  val mongoConfig = new MongoConfig
-  val serverLog: ServerLog = new ServerLog(serverConfig)
-  val transactionLog: TransactionLog = new TransactionLog
-  val recipientWalletDAO = new RecipientWalletDAO(mongoConfig.mongoDb)
-  val bitcoinClient: BitcoinClient =
-    new BitcoinClient(transactionLog, bitcoinConfig, notificationActor)
-  val transactionControl =
-    new TransactionControl(transactionLog, bitcoinClient)
+  lazy val partialRoutes: Seq[PartialRoute] = Seq(transactionRouter)
 
-  // actors
-  def transactionActor: ActorRef =
-    system.actorOf(
-      TransactionActor.props(transactionControl, transactionLog, ec),
-      "transaction-actor")
-  def notificationActor: ActorRef =
-    system.actorOf(NotificationActor.props, "notification-actor")
+  lazy val allRoutes: Route = partialRoutes.foldRight[Route](reject) {
+    (partial, builder) =>
+      partial.router ~ builder
+  }
 
-  val server: Server = new Server(serverConfig, transactionActor)
-  val binding = server.bind()
+  lazy val router: Flow[HttpRequest, HttpResponse, NotUsed] =
+    Route.handlerFlow(allRoutes)
+
+  lazy val binding: Future[ServerBinding] =
+    Http().bindAndHandle(router, config.host, config.port)
+
   binding.onComplete {
     case Success(_)     => serverLog.successfulStart
     case Failure(error) => serverLog.failedStart(error.getMessage)
