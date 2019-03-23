@@ -23,12 +23,13 @@ class Module @Inject()(implicit val ec: ExecutionContext)
   override def configure(): Unit = {
     bind(classOf[ActorSystem]).toInstance(ActorSystem("emailbitcoin"))
 
-    bind(classOf[TransactionRouter]).asEagerSingleton()
-    bind(classOf[ServerLog]).asEagerSingleton()
-    bind(classOf[TransactionLog]).asEagerSingleton()
-    bind(classOf[RecipientWalletDAO]).asEagerSingleton()
-    bind(classOf[BitcoinClient]).asEagerSingleton()
-    bind(classOf[TransactionControl]).asEagerSingleton()
+    bind(classOf[TransactionRouter])
+    bind(classOf[ServerLog])
+    bind(classOf[TransactionLog])
+    bind(classOf[RecipientWalletDAO])
+    bind(classOf[BitcoinClient])
+    bind(classOf[TransactionControl])
+    bind(classOf[EmailBitcoin])
   }
 
   @Provides

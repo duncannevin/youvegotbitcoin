@@ -29,10 +29,11 @@ class TransactionActor @Inject()(
 
   override def receive: Receive = {
     case CreateWallet(creationForm) =>
+      val s = sender
       for {
         recipientWallet <- transactionControl.addWallet(creationForm)
         _ <- recipientWalletDAO.save(recipientWallet)
-      } yield sender ! recipientWallet.publicKeyAddress
+      } yield s ! recipientWallet.publicKeyAddress
     case _ =>
       transactionLog.unrecognizedMessageSentToActor()
   }
