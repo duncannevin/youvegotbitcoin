@@ -1,4 +1,5 @@
 package com.giftedprimate.models
+import akka.http.scaladsl.model.DateTime
 import org.bitcoinj.crypto.DeterministicKey
 import org.bitcoinj.wallet.Wallet
 import org.bson.codecs.configuration.CodecRegistries.{
@@ -16,6 +17,7 @@ object RecipientWallet {
     val deterministic: DeterministicKey = wallet.getWatchingKey
     new RecipientWallet(
       createForm,
+      createdAt = DateTime.now.toString(),
       seed = wallet.getKeyChainSeed.getMnemonicCode.toArray().mkString(" "),
       privateKey = deterministic.serializePrivB58(wallet.getParams),
       publicKey = deterministic.serializePubB58(wallet.getParams),
@@ -36,6 +38,7 @@ object RecipientWallet {
 
 case class RecipientWallet(
     createForm: CreationForm,
+    createdAt: String,
     seed: String,
     privateKey: String,
     publicKey: String,

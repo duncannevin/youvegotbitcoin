@@ -3,23 +3,28 @@ import java.nio.file.Paths
 import java.util
 
 import akka.actor.ActorRef
-import com.giftedprimate.configuration.BitcoinConfig
-import com.giftedprimate.loggers.TransactionLog
+import com.giftedprimate.configuration.{BitcoinConfig, SystemConfig}
+import com.giftedprimate.loggers.{BitcoinLogger, TransactionLog}
+import com.giftedprimate.models.{CreationForm, RecipientWallet}
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import org.bitcoinj.core._
 import org.bitcoinj.core.listeners.PeerDataEventListener
 import org.bitcoinj.net.discovery.DnsDiscovery
 import org.bitcoinj.params.{MainNetParams, RegTestParams, TestNet3Params}
+import org.bitcoinj.script.Script.ScriptType
 import org.bitcoinj.store.{BlockStore, MemoryBlockStore}
 import org.bitcoinj.utils.BriefLogFormatter
 import org.bitcoinj.wallet.Wallet
 import org.bitcoinj.wallet.listeners.WalletCoinsReceivedEventListener
 
+import scala.concurrent.Future
+
 class BitcoinClient @Inject()(
-    transactionLog: TransactionLog,
+    logger: BitcoinLogger,
     config: BitcoinConfig,
-    @Named("notification-actor") notificationActor: ActorRef
+    systemConfig: SystemConfig,
+    @Named("transaction-actor") transactionActor: ActorRef,
 ) {
   object tags {
     final val forwardingService = "forwarding-service"
@@ -57,9 +62,10 @@ class BitcoinClient @Inject()(
 
   val walletListener: WalletCoinsReceivedEventListener =
     (wallet: Wallet, tx: Transaction, prevBalance: Coin, newBalance: Coin) => {
-      println(
-        s"funds received: {wallet: $wallet, tx: $tx, prevBalance: $prevBalance, newBalance: $newBalance}")
-      // todo -> react to payment -> send email with notification actor
+      transactionActor ! IncomingTransaction(wallet,
+                                             tx,
+                                             prevBalance,
+                                             newBalance)
     }
 
   val blockChainDownloadListener: PeerDataEventListener =
@@ -68,7 +74,7 @@ class BitcoinClient @Inject()(
         null
 
       override def onChainDownloadStarted(peer: Peer, blocksLeft: Int): Unit =
-        transactionLog.blockChainDownloadStarted(blocksLeft)
+        logger.blockChainDownloadStarted(blocksLeft)
 
       override def onPreMessageReceived(peer: Peer, msg: Message): Message = msg
 
@@ -78,9 +84,22 @@ class BitcoinClient @Inject()(
           filteredBlock: FilteredBlock,
           blocksLeft: Int
       ): Unit = {
-        if (blocksLeft == 0) transactionLog.blockChainDownloadFinished()
+        if (blocksLeft == 0) logger.blockChainDownloadFinished()
       }
     }
+
+  def addWallet(creationForm: CreationForm): Future[RecipientWallet] = {
+    val wallet: Wallet =
+      Wallet.createDeterministic(params, ScriptType.P2PKH)
+    val recipientWallet = RecipientWallet(wallet, creationForm)
+    wallet.setDescription(
+      s"for: ${creationForm.recipientEmail} from ${creationForm.senderEmail}")
+    wallet.addCoinsReceivedEventListener(walletListener)
+    wallet.setAcceptRiskyTransactions(true)
+    peerGroup.addWallet(wallet)
+    logger.watchingWallet(recipientWallet)
+    Future.successful(recipientWallet)
+  }
 
   private def init(): Unit = {
     Context.propagate(peerGroupContext)
@@ -95,7 +114,7 @@ class BitcoinClient @Inject()(
         peerGroup.addPeerDiscovery(new DnsDiscovery(params))
         peerGroup.start()
     }
-    transactionLog.startingBitcoin(config.network)
+    logger.startingBitcoin(config.network)
   }
 
   init()

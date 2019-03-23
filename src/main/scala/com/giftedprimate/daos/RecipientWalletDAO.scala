@@ -4,6 +4,7 @@ import com.giftedprimate.models.RecipientWallet
 import javax.inject.Inject
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala.{MongoCollection, MongoDatabase}
+import org.mongodb.scala.model.Filters._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
@@ -13,8 +14,8 @@ class RecipientWalletDAO @Inject()(
     DAOLogger: DAOLogger
 ) extends EmailbitcoinDAO[RecipientWallet] {
   override val database: MongoDatabase = mongoDatabase
-  override val collectionName: String = "recipient-wallet"
-  override val indexKey: String = "publicKeyAddress"
+  override val collectionName: String = "recipient_wallet"
+  override val indexKey: String = "publicKey"
   override val codecRegistry: CodecRegistry = RecipientWallet.codecRegistry
   override val collection: MongoCollection[RecipientWallet] = database
     .getCollection[RecipientWallet](collectionName)
@@ -24,6 +25,14 @@ class RecipientWalletDAO @Inject()(
     for {
       _ <- collection.insertOne(recipientWallet).toFuture()
     } yield recipientWallet
+
+  def find(publicKey: String): Future[Option[RecipientWallet]] =
+    for {
+      wallet <- collection
+        .find(equal("publicKey", publicKey))
+        .first()
+        .toFutureOption()
+    } yield wallet
 
   indexCollection(DAOLogger)
 }

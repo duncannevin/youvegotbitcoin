@@ -5,7 +5,8 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
 import com.giftedprimate.models.CreationForm
-import com.giftedprimate.transaction.TransactionActor.CreateWallet
+import com.giftedprimate.transaction.FundData
+import com.giftedprimate.transaction.NewWalletActor.CreateWallet
 import com.giftedprimate.validators.{
   CreateWalletValidator,
   ValidatorDirectives,
@@ -16,7 +17,7 @@ import com.google.inject.name.Named
 
 @Singleton
 class TransactionRouter @Inject()(
-    @Named("transaction-actor") transactionActor: ActorRef,
+    @Named("new-wallet-actor") newWalletActor: ActorRef,
     implicit val actorSystem: ActorSystem
 ) extends PartialRoute
     with Directives
@@ -32,8 +33,8 @@ class TransactionRouter @Inject()(
         entity(as[CreationForm]) { creationForm =>
           validateWith(CreateWalletValidator)(creationForm) {
             val reqPublicKey =
-              (transactionActor ? CreateWallet(creationForm))
-                .mapTo[String]
+              (newWalletActor ? CreateWallet(creationForm))
+                .mapTo[FundData]
             onSuccess(reqPublicKey) { publicKeyAddress =>
               complete(StatusCodes.OK, publicKeyAddress)
             }

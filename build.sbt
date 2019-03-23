@@ -38,7 +38,9 @@ libraryDependencies ++= Seq(
 
   "org.bitcoinj" % "bitcoinj-core" % bitcoinjVersion % "compile",
 
-  "org.mongodb.scala" %% "mongo-scala-driver" % mongoDriverVersion
+  "org.mongodb.scala" %% "mongo-scala-driver" % mongoDriverVersion,
+
+  "com.github.nscala-time" %% "nscala-time" % "2.22.0"
 )
 
 mainClass in Global := Some("com.giftedprimate.Main")
