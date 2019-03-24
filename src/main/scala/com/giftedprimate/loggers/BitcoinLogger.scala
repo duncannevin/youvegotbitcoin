@@ -10,4 +10,6 @@ class BitcoinLogger extends Logger {
     logger.info("block chain download is finished")
   def watchingWallet(recipientWallet: RecipientWallet): Unit =
     logger.info(s"watching wallet: ${recipientWallet.publicKey}")
+  def reloadingExistingWallets(): Unit =
+    logger.info("starting reload of existing wallets")
 }

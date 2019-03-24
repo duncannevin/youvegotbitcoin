@@ -34,5 +34,10 @@ class RecipientWalletDAO @Inject()(
         .toFutureOption()
     } yield wallet
 
+  def getAll: Future[Seq[RecipientWallet]] =
+    for {
+      wallets <- collection.find().toFuture()
+    } yield wallets
+
   indexCollection(DAOLogger)
 }
