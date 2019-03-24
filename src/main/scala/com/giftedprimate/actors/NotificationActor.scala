@@ -1,11 +1,16 @@
 package com.giftedprimate.actors
 
 import akka.actor.{Actor, Props}
-import com.giftedprimate.daos.{RecipientWalletDAO, EmailBtcTransactionDAO}
+import com.giftedprimate.actors.NotificationActor.NotifyRecipient
+import com.giftedprimate.daos.{EmailBtcTransactionDAO, RecipientWalletDAO}
+import com.giftedprimate.entities.{EmailBtcTransaction, Session}
 import com.giftedprimate.loggers.NotificationLogger
 import com.google.inject.Inject
 
 object NotificationActor {
+  final case class NotifyRecipient(session: Session,
+                                   transaction: EmailBtcTransaction)
+
   def props(logger: NotificationLogger,
             transactionDAO: EmailBtcTransactionDAO,
             recipientWalletDAO: RecipientWalletDAO): Props =
@@ -19,6 +24,9 @@ class NotificationActor @Inject()(
 ) extends Actor {
 
   override def receive: Receive = {
+    case NotifyRecipient(session, transaction) =>
+      println(
+        s"NOTIFY: ${transaction.recipientEmail} SESSIONID: ${session.sessionId}")
     case _ => logger.unrecognizedMessageSentToActor()
   }
 }

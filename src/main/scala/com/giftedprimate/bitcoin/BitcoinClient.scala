@@ -19,11 +19,9 @@ import org.bitcoinj.script.Script
 import org.bitcoinj.script.Script.ScriptType
 import org.bitcoinj.store.{BlockStore, MemoryBlockStore}
 import org.bitcoinj.utils.BriefLogFormatter
-import org.bitcoinj.wallet.{DeterministicSeed, Wallet}
 import org.bitcoinj.wallet.listeners.WalletCoinsReceivedEventListener
-import org.bouncycastle.util.encoders.Hex
+import org.bitcoinj.wallet.{DeterministicSeed, Wallet}
 
-import collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

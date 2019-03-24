@@ -10,7 +10,7 @@ import akka.http.scaladsl.settings.RoutingSettings
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import com.giftedprimate.configuration.ServerConfig
-import com.giftedprimate.loggers.ServerLog
+import com.giftedprimate.loggers.ServerLogger
 import com.giftedprimate.router.{PartialRoute, Routes, TransactionRouter}
 import com.google.inject.Inject
 
@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
 
 class EmailBitcoin @Inject()(
     routes: Routes,
-    serverLog: ServerLog,
+    serverLog: ServerLogger,
     config: ServerConfig
 )(
     implicit val actorSystem: ActorSystem

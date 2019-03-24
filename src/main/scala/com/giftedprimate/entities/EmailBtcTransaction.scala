@@ -18,8 +18,10 @@ object EmailBtcTransaction {
 }
 
 case class EmailBtcTransaction(
+    createdAt: String,
     publicKey: String,
     transactionId: String,
     senderEmail: String,
-    recipientEmail: String
+    recipientEmail: String,
+    value: Long
 )

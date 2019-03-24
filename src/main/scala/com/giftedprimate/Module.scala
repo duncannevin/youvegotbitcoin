@@ -3,17 +3,17 @@ import akka.actor.{ActorRef, ActorSystem}
 import com.giftedprimate.actors.{
   NewWalletActor,
   NotificationActor,
+  SessionActor,
   TransactionActor
 }
 import com.giftedprimate.bitcoin.BitcoinClient
 import com.giftedprimate.configuration._
-import com.giftedprimate.daos.{RecipientWalletDAO, EmailBtcTransactionDAO}
-import com.giftedprimate.loggers.{
-  BitcoinLogger,
-  NotificationLogger,
-  ServerLog,
-  TransactionLog
+import com.giftedprimate.daos.{
+  EmailBtcTransactionDAO,
+  RecipientWalletDAO,
+  SessionDAO
 }
+import com.giftedprimate.loggers._
 import com.giftedprimate.router.{Routes, TransactionRouter}
 import com.google.inject.{AbstractModule, Inject, Provides}
 import com.sandinh.akuice.AkkaGuiceSupport
@@ -29,11 +29,12 @@ class Module @Inject()(implicit val ec: ExecutionContext)
     bind(classOf[ActorSystem]).toInstance(ActorSystem("emailbitcoin"))
 
     bind(classOf[TransactionRouter])
-    bind(classOf[ServerLog])
-    bind(classOf[TransactionLog])
+    bind(classOf[ServerLogger])
+    bind(classOf[TransactionLogger])
     bind(classOf[NotificationLogger])
     bind(classOf[RecipientWalletDAO])
     bind(classOf[EmailBtcTransactionDAO])
+    bind(classOf[SessionDAO])
     bind(classOf[BitcoinClient])
     bind(classOf[EmailBitcoin])
     bind(classOf[BitcoinLogger])
@@ -43,15 +44,18 @@ class Module @Inject()(implicit val ec: ExecutionContext)
   @Provides
   @Singleton
   @Named("transaction-actor")
-  def getTransactionActor(actorSystem: ActorSystem,
-                          transactionLog: TransactionLog,
-                          recipientWalletDAO: RecipientWalletDAO,
-                          transactionDAO: EmailBtcTransactionDAO): ActorRef =
+  def getTransactionActor(
+      actorSystem: ActorSystem,
+      transactionLog: TransactionLogger,
+      recipientWalletDAO: RecipientWalletDAO,
+      transactionDAO: EmailBtcTransactionDAO,
+      @Named("session-actor") sessionActor: ActorRef): ActorRef =
     actorSystem.actorOf(
       TransactionActor.props(
         transactionLog,
         recipientWalletDAO,
-        transactionDAO
+        transactionDAO,
+        sessionActor
       ))
 
   @Provides
@@ -73,6 +77,17 @@ class Module @Inject()(implicit val ec: ExecutionContext)
                            transactionDAO: EmailBtcTransactionDAO): ActorRef =
     actorSystem.actorOf(
       NotificationActor.props(logger, transactionDAO, recipientWalletDAO))
+
+  @Provides
+  @Singleton
+  @Named("session-actor")
+  def getSessionActor(
+      actorSystem: ActorSystem,
+      logger: SessionLogger,
+      sessionDAO: SessionDAO,
+      @Named("notification-actor") notificationActor: ActorRef): ActorRef =
+    actorSystem.actorOf(
+      SessionActor.props(logger, sessionDAO, notificationActor))
 
   @Provides
   def mongoDb(configFactory: EmailBitcoinConfigFactory): MongoDatabase = {
