@@ -1,4 +1,4 @@
-package com.giftedprimate.models
+package com.giftedprimate.entities
 import akka.http.scaladsl.model.DateTime
 import org.bitcoinj.crypto.DeterministicKey
 import org.bitcoinj.wallet.Wallet

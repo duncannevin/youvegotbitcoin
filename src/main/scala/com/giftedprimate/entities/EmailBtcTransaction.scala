@@ -1,4 +1,4 @@
-package com.giftedprimate.models
+package com.giftedprimate.entities
 import org.bson.codecs.configuration.CodecRegistries.{
   fromProviders,
   fromRegistries
@@ -6,18 +6,18 @@ import org.bson.codecs.configuration.CodecRegistries.{
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala.bson.codecs.{DEFAULT_CODEC_REGISTRY, Macros}
 
-object Transaction {
+object EmailBtcTransaction {
   def codecRegistry: CodecRegistry = {
     fromRegistries(
       fromProviders(
-        Macros.createCodecProvider[Transaction](),
+        Macros.createCodecProvider[EmailBtcTransaction](),
       ),
       DEFAULT_CODEC_REGISTRY
     )
   }
 }
 
-case class Transaction(
+case class EmailBtcTransaction(
     publicKey: String,
     transactionId: String,
     senderEmail: String,

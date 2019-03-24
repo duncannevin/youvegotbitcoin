@@ -11,7 +11,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import com.giftedprimate.configuration.ServerConfig
 import com.giftedprimate.loggers.ServerLog
-import com.giftedprimate.router.{PartialRoute, TransactionRouter}
+import com.giftedprimate.router.{PartialRoute, Routes, TransactionRouter}
 import com.google.inject.Inject
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,7 +20,7 @@ import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
 class EmailBitcoin @Inject()(
-    transactionRouter: TransactionRouter,
+    routes: Routes,
     serverLog: ServerLog,
     config: ServerConfig
 )(
@@ -29,7 +29,7 @@ class EmailBitcoin @Inject()(
   implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
   implicit val routerSettings: RoutingSettings = RoutingSettings.default
 
-  lazy val partialRoutes: Seq[PartialRoute] = Seq(transactionRouter)
+  lazy val partialRoutes: Seq[PartialRoute] = routes.routes
 
   lazy val allRoutes: Route = partialRoutes.foldRight[Route](reject) {
     (partial, builder) =>

@@ -1,6 +1,6 @@
 package com.giftedprimate.daos
 import com.giftedprimate.loggers.DAOLogger
-import com.giftedprimate.models.RecipientWallet
+import com.giftedprimate.entities.RecipientWallet
 import javax.inject.Inject
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala.{MongoCollection, MongoDatabase}

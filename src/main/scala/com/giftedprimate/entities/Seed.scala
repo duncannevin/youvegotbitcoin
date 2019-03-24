@@ -1,3 +1,3 @@
-package com.giftedprimate.transaction
+package com.giftedprimate.entities
 
 case class Seed(mnemonic: Seq[String], binaryKey: String)

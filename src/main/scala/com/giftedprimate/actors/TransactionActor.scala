@@ -1,9 +1,9 @@
-package com.giftedprimate.transaction
+package com.giftedprimate.actors
 
 import akka.actor.{Actor, Props}
-import com.giftedprimate.daos.{RecipientWalletDAO, TransactionDAO}
+import com.giftedprimate.daos.{RecipientWalletDAO, EmailBtcTransactionDAO}
 import com.giftedprimate.loggers.TransactionLog
-import com.giftedprimate.models.{CreationForm, Transaction}
+import com.giftedprimate.entities.{IncomingTransaction, EmailBtcTransaction}
 import com.google.inject.Inject
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -11,12 +11,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object TransactionActor {
   final case class ExistingTransaction(transactionId: String)
   final case class NewTransaction(publicKey: String, transactionId: String)
-  final case class SaveTransaction(transaction: Transaction)
+  final case class SaveTransaction(transaction: EmailBtcTransaction)
 
   def props(
       logger: TransactionLog,
       recipientWalletDAO: RecipientWalletDAO,
-      transactionDAO: TransactionDAO
+      transactionDAO: EmailBtcTransactionDAO
   ): Props = Props(
     new TransactionActor(logger, recipientWalletDAO, transactionDAO)
   )
@@ -25,7 +25,7 @@ object TransactionActor {
 class TransactionActor @Inject()(
     logger: TransactionLog,
     recipientWalletDAO: RecipientWalletDAO,
-    transactionDAO: TransactionDAO
+    transactionDAO: EmailBtcTransactionDAO
 ) extends Actor {
   import TransactionActor._
 
@@ -48,7 +48,7 @@ class TransactionActor @Inject()(
       } yield
         recipientWalletOpt match {
           case Some(recipientWallet) =>
-            val transaction = Transaction(
+            val transaction = EmailBtcTransaction(
               publicKey,
               transactionId,
               recipientWallet.createForm.senderEmail,

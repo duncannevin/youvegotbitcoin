@@ -1,11 +1,17 @@
-package com.giftedprimate.transaction
+package com.giftedprimate.bitcoin
+
 import java.nio.file.Paths
 import java.util
 
 import akka.actor.ActorRef
 import com.giftedprimate.configuration.{BitcoinConfig, SystemConfig}
-import com.giftedprimate.loggers.{BitcoinLogger, TransactionLog}
-import com.giftedprimate.models.{CreationForm, RecipientWallet}
+import com.giftedprimate.entities
+import com.giftedprimate.loggers.BitcoinLogger
+import com.giftedprimate.entities.{
+  CreationForm,
+  IncomingTransaction,
+  RecipientWallet
+}
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import org.bitcoinj.core._
@@ -62,10 +68,10 @@ class BitcoinClient @Inject()(
 
   val walletListener: WalletCoinsReceivedEventListener =
     (wallet: Wallet, tx: Transaction, prevBalance: Coin, newBalance: Coin) => {
-      transactionActor ! IncomingTransaction(wallet,
-                                             tx,
-                                             prevBalance,
-                                             newBalance)
+      transactionActor ! entities.IncomingTransaction(wallet,
+                                                      tx,
+                                                      prevBalance,
+                                                      newBalance)
     }
 
   val blockChainDownloadListener: PeerDataEventListener =

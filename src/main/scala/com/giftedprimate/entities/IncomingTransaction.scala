@@ -1,4 +1,4 @@
-package com.giftedprimate.transaction
+package com.giftedprimate.entities
 import org.bitcoinj.core.{Coin, Transaction}
 import org.bitcoinj.wallet.Wallet
 

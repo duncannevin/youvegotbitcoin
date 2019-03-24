@@ -1,4 +1,4 @@
-package com.giftedprimate.models
+package com.giftedprimate.entities
 
 case class CreationForm(
     recipientEmail: String,

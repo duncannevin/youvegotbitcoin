@@ -1,7 +1,9 @@
-package com.giftedprimate.transaction
+package com.giftedprimate.actors
+
 import akka.actor.{Actor, Props}
+import com.giftedprimate.bitcoin.BitcoinClient
 import com.giftedprimate.daos.RecipientWalletDAO
-import com.giftedprimate.models.CreationForm
+import com.giftedprimate.entities.{CreationForm, FundData}
 import com.google.inject.Inject
 
 import scala.concurrent.ExecutionContext.Implicits.global

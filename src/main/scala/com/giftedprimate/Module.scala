@@ -1,20 +1,20 @@
 package com.giftedprimate
 import akka.actor.{ActorRef, ActorSystem}
+import com.giftedprimate.actors.{
+  NewWalletActor,
+  NotificationActor,
+  TransactionActor
+}
+import com.giftedprimate.bitcoin.BitcoinClient
 import com.giftedprimate.configuration._
-import com.giftedprimate.daos.{RecipientWalletDAO, TransactionDAO}
+import com.giftedprimate.daos.{RecipientWalletDAO, EmailBtcTransactionDAO}
 import com.giftedprimate.loggers.{
   BitcoinLogger,
   NotificationLogger,
   ServerLog,
   TransactionLog
 }
-import com.giftedprimate.notification.NotificationActor
-import com.giftedprimate.router.TransactionRouter
-import com.giftedprimate.transaction.{
-  BitcoinClient,
-  NewWalletActor,
-  TransactionActor
-}
+import com.giftedprimate.router.{Routes, TransactionRouter}
 import com.google.inject.{AbstractModule, Inject, Provides}
 import com.sandinh.akuice.AkkaGuiceSupport
 import javax.inject.{Named, Singleton}
@@ -33,10 +33,11 @@ class Module @Inject()(implicit val ec: ExecutionContext)
     bind(classOf[TransactionLog])
     bind(classOf[NotificationLogger])
     bind(classOf[RecipientWalletDAO])
-    bind(classOf[TransactionDAO])
+    bind(classOf[EmailBtcTransactionDAO])
     bind(classOf[BitcoinClient])
     bind(classOf[EmailBitcoin])
     bind(classOf[BitcoinLogger])
+    bind(classOf[Routes])
   }
 
   @Provides
@@ -45,7 +46,7 @@ class Module @Inject()(implicit val ec: ExecutionContext)
   def getTransactionActor(actorSystem: ActorSystem,
                           transactionLog: TransactionLog,
                           recipientWalletDAO: RecipientWalletDAO,
-                          transactionDAO: TransactionDAO): ActorRef =
+                          transactionDAO: EmailBtcTransactionDAO): ActorRef =
     actorSystem.actorOf(
       TransactionActor.props(
         transactionLog,
@@ -69,7 +70,7 @@ class Module @Inject()(implicit val ec: ExecutionContext)
   def getNotificationActor(actorSystem: ActorSystem,
                            logger: NotificationLogger,
                            recipientWalletDAO: RecipientWalletDAO,
-                           transactionDAO: TransactionDAO): ActorRef =
+                           transactionDAO: EmailBtcTransactionDAO): ActorRef =
     actorSystem.actorOf(
       NotificationActor.props(logger, transactionDAO, recipientWalletDAO))
 

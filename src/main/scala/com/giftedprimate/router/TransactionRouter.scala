@@ -4,9 +4,8 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
-import com.giftedprimate.models.CreationForm
-import com.giftedprimate.transaction.FundData
-import com.giftedprimate.transaction.NewWalletActor.CreateWallet
+import com.giftedprimate.actors.NewWalletActor.CreateWallet
+import com.giftedprimate.entities.{CreationForm, FundData}
 import com.giftedprimate.validators.{
   CreateWalletValidator,
   ValidatorDirectives,
