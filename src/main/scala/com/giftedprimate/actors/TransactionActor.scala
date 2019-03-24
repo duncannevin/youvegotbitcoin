@@ -64,8 +64,7 @@ class TransactionActor @Inject()(
               DateTime.now.toString,
               publicKey,
               transactionId,
-              recipientWallet.createForm.senderEmail,
-              recipientWallet.createForm.recipientEmail,
+              recipientWallet.createForm,
               value
             )
             self ! SaveTransaction(transaction)

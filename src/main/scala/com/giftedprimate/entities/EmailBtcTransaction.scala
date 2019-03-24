@@ -11,6 +11,7 @@ object EmailBtcTransaction {
     fromRegistries(
       fromProviders(
         Macros.createCodecProvider[EmailBtcTransaction](),
+        Macros.createCodecProvider[CreationForm]()
       ),
       DEFAULT_CODEC_REGISTRY
     )
@@ -21,7 +22,6 @@ case class EmailBtcTransaction(
     createdAt: String,
     publicKey: String,
     transactionId: String,
-    senderEmail: String,
-    recipientEmail: String,
+    creationForm: CreationForm,
     value: Long
 )

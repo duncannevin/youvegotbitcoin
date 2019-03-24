@@ -26,7 +26,7 @@ class NotificationActor @Inject()(
   override def receive: Receive = {
     case NotifyRecipient(session, transaction) =>
       println(
-        s"NOTIFY: ${transaction.recipientEmail} SESSIONID: ${session.sessionId}")
+        s"NOTIFY: ${transaction.creationForm.recipientEmail} SESSIONID: ${session.sessionId}")
     case _ => logger.unrecognizedMessageSentToActor()
   }
 }
