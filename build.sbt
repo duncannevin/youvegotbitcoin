@@ -40,7 +40,9 @@ libraryDependencies ++= Seq(
 
   "org.mongodb.scala" %% "mongo-scala-driver" % mongoDriverVersion,
 
-  "com.github.nscala-time" %% "nscala-time" % "2.22.0"
+  "com.github.nscala-time" %% "nscala-time" % "2.22.0",
+
+  "com.lihaoyi" %% "scalatags" % "0.6.7"
 )
 
 mainClass in Global := Some("com.giftedprimate.Main")

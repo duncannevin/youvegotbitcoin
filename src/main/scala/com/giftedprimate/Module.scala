@@ -14,7 +14,7 @@ import com.giftedprimate.daos.{
   SessionDAO
 }
 import com.giftedprimate.loggers._
-import com.giftedprimate.router.{Routes, TransactionRouter}
+import com.giftedprimate.router.{ClientRouter, Routes, TransactionRouter}
 import com.google.inject.{AbstractModule, Inject, Provides}
 import com.sandinh.akuice.AkkaGuiceSupport
 import javax.inject.{Named, Singleton}
@@ -28,6 +28,7 @@ class Module @Inject()(implicit val ec: ExecutionContext)
   override def configure(): Unit = {
     bind(classOf[ActorSystem]).toInstance(ActorSystem("emailbitcoin"))
 
+    bind(classOf[ClientRouter])
     bind(classOf[TransactionRouter])
     bind(classOf[ServerLogger])
     bind(classOf[TransactionLogger])
