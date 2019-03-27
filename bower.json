@@ -18,7 +18,6 @@
     ".idea",
     "*.class",
     "*.log",
-
     "# sbt specific",
     ".cache/",
     ".history/",
@@ -29,7 +28,6 @@
     "src_managed/",
     "project/boot/",
     "project/plugins/project/",
-
     "# Scala-IDE specific",
     ".scala_dependencies",
     ".worksheet",
@@ -38,6 +36,8 @@
   ],
   "dependencies": {
     "bootstrap": "^4.2.1",
-    "jquery": "^3.3.1"
+    "jquery": "^3.3.1",
+    "bitcore-lib": "^0.13.7",
+    "bitcore-mnemonic": "^1.0.1"
   }
 }

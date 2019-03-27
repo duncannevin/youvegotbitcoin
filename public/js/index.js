@@ -1,3 +1,3 @@
 $(function () {
-  $('div').css({'background-color': 'purple'})
+  $('body').append('<pre>' + JSON.stringify(new Wallet(), null, 2) + '</pre>')
 })

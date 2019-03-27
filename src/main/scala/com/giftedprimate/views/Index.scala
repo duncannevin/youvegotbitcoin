@@ -20,10 +20,16 @@ trait Index {
             href := "/bower_components/bootstrap/dist/css/bootstrap.min.css"),
           script(src := "/bower_components/jquery/dist/jquery.min.js"),
           script(src := "/bower_components/bootstrap/dist/js/bootstrap.min.js"),
+          script(
+            src := "/bower_components/bitcore-lib/bitcore-lib.min.js"
+          ),
+          script(
+            src := "/bower_components/bitcore-mnemonic/bitcore-mnemonic.js"
+          ),
+          script(src := "/js/Wallet.js"),
           script(src := "/js/index.js")
         ),
         body(
-          div(`class` := "container", page)
-        )
+          )
       )
 }
