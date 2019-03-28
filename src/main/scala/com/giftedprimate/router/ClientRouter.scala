@@ -1,13 +1,13 @@
 package com.giftedprimate.router
 import akka.http.scaladsl.server.Route
 import com.giftedprimate.validators.ClientDirectives
-import com.giftedprimate.views.Index
+import com.giftedprimate.views.Views
 
-class ClientRouter extends Index with PartialRoute with ClientDirectives {
+class ClientRouter extends Views with PartialRoute with ClientDirectives {
   override def router: Route = {
     pathEndOrSingleSlash {
       get {
-        toHtml(main("Hello, Me!"))
+        toHtml(index("main"))
       }
     } ~ pathPrefix("css") {
       getFromDirectory("public/css")
