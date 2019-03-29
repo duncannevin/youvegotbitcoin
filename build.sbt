@@ -45,4 +45,4 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %% "scalatags" % "0.6.7"
 )
 
-mainClass in Global := Some("com.giftedprimate.Main")
+mainClass in Global := Some("com.giftedprimate.emailbitcoin.Main")
