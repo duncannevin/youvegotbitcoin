@@ -1,21 +1,15 @@
 package com.giftedprimate.emailbitcoin.router
 
-import java.util.NoSuchElementException
-
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.{Directives, Route}
 import com.giftedprimate.emailbitcoin.daos.{RecipientWalletDAO, SessionDAO}
-import com.giftedprimate.emailbitcoin.messages.ApiError
 import com.giftedprimate.emailbitcoin.validators.{
   ClientDirectives,
-  ValidatorDirectives,
-  EBDirectives
+  EBDirectives,
+  ValidatorDirectives
 }
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
-import html.payTransaction
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class HomeRouter @Inject()(

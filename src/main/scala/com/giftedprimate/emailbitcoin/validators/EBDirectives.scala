@@ -1,6 +1,8 @@
 package com.giftedprimate.emailbitcoin.validators
+
 import akka.http.scaladsl.server.{Directive1, Directives, Route}
 import com.giftedprimate.emailbitcoin.entities.{RecipientWallet, Session}
+import com.giftedprimate.emailbitcoin.loggers.DirectiveLogger
 import com.giftedprimate.emailbitcoin.messages.ApiError
 import play.twirl.api.HtmlFormat
 
@@ -8,6 +10,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 trait EBDirectives extends Directives with ClientDirectives {
+  private val logger = new DirectiveLogger
 
   def handle[T](f: Future[T])(e: Throwable => ApiError): Directive1[T] =
     onComplete(f) flatMap {
@@ -21,12 +24,14 @@ trait EBDirectives extends Directives with ClientDirectives {
       handler: (Session, RecipientWallet) => HtmlFormat.Appendable): Route =
     handle(f)(_ => ApiError.generic) { t =>
       t.asInstanceOf[(Option[Session], Option[RecipientWallet])] match {
-        case (Some(session), None) => ??? // todo
+        case (Some(session), None) =>
+          logger.sessionHasNoWallet(session)
+          toHtml(html.serverError.render())
         case (Some(session), Some(wallet)) if session.status == desiredStatus =>
           toHtml(handler(session, wallet))
         case (Some(session), Some(wallet)) if session.status != desiredStatus =>
-          ??? // todo
-        case _ => ??? // todo
+          toHtml(html.badRequest.render())
+        case _ => toHtml(html.serverError())
       }
     }
 }
