@@ -52,10 +52,12 @@ class SessionDAO @Inject()(
     } yield (session, wallet)
 
   def findByPublicKey(publicKey: String): Future[Option[Session]] =
-    for (sessionOpt <- collection
-           .find(equal("publicKey", publicKey))
-           .first()
-           .toFutureOption()) yield sessionOpt
+    for {
+      sessionOpt <- collection
+        .find(equal("publicKey", publicKey))
+        .first()
+        .toFutureOption()
+    } yield sessionOpt
 
   def updateStatus(publicKey: String, status: String): Future[Session] = {
     val validStatus = List("pending", "funded", "complete")

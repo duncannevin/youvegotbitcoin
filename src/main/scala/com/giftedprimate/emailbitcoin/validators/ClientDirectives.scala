@@ -9,6 +9,6 @@ trait ClientDirectives extends Directives {
   }
 
   def redirectTo(route: String): StandardRoute = {
-    redirect(route, StatusCodes.PermanentRedirect)
+    redirect(route, StatusCodes.SeeOther)
   }
 }

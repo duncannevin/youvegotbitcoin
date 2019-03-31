@@ -9,7 +9,7 @@ import com.giftedprimate.emailbitcoin.validators.{
   ClientDirectives,
   CreateWalletValidator,
   ValidatorDirectives,
-  WalletDirectives
+  EBDirectives
 }
 import com.google.inject.Inject
 import com.google.inject.name.Named
@@ -20,7 +20,7 @@ class TransactionRouter @Inject()(
     implicit val actorSystem: ActorSystem
 ) extends PartialRoute
     with Directives
-    with WalletDirectives
+    with EBDirectives
     with ValidatorDirectives
     with ClientDirectives {
 
@@ -37,7 +37,7 @@ class TransactionRouter @Inject()(
                 (newWalletActor ? CreateWallet(creationForm))
                   .mapTo[Session]
               onSuccess(reqPublicKey) { session =>
-                redirectTo(s"/getpka?sessionid=${session.sessionId}")
+                complete(s"/getpka?sessionid=${session.sessionId}")
               }
             }
           }

@@ -9,10 +9,11 @@ import com.giftedprimate.emailbitcoin.messages.ApiError
 import com.giftedprimate.emailbitcoin.validators.{
   ClientDirectives,
   ValidatorDirectives,
-  WalletDirectives
+  EBDirectives
 }
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
+import html.payTransaction
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -24,7 +25,7 @@ class HomeRouter @Inject()(
     recipientWalletDAO: RecipientWalletDAO
 ) extends PartialRoute
     with Directives
-    with WalletDirectives
+    with EBDirectives
     with ValidatorDirectives
     with ClientDirectives {
 
@@ -35,12 +36,9 @@ class HomeRouter @Inject()(
       }
     } ~ pathPrefix("getpka") {
       parameter('sessionid) { sessionId =>
-        handle(sessionDAO.findWithWallet(sessionId))(v =>
-          ApiError.noSessionError) {
-          case (Some(session), None)         => ???
-          case (None, Some(wallet))          => ???
-          case (Some(session), Some(wallet)) => ???
-          case _                             => ???
+        handleSessionWallet(sessionDAO.findWithWallet(sessionId))("pending") {
+          (_, recipientWallet) =>
+            html.payTransaction.render(recipientWallet)
         }
       }
     } ~ pathPrefix("css") {

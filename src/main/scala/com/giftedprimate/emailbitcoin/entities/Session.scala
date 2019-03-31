@@ -15,7 +15,7 @@ object Session {
     new Session(UUID.randomUUID().toString,
                 date,
                 date,
-                recipientWallet.publicKeyAddress,
+                recipientWallet.publicKey,
                 "pending")
   }
 
