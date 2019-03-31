@@ -1,0 +1,21 @@
+@(title: String)(content: Html)
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>@title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+        <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="/bower_components/axios/dist/axios.min.js"></script>
+        <link rel="stylesheet" href="/css/main.css">
+    </head>
+    <body>
+        @* And here's where we render the `Html` object containing
+        * the page content. *@
+        @content
+
+        <script src="/js/main.js"></script>
+    </body>
+</html>

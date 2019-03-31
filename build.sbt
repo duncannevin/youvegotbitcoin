@@ -13,6 +13,9 @@ val circeVersion = "0.9.3"
 val bitcoinjVersion = "0.15"
 val akkaGuiceVersion = "3.2.0"
 val mongoDriverVersion = "2.4.0"
+val twirlVersion = "1.4.0"
+
+lazy val root = (project in file(".")).enablePlugins(SbtTwirl)
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,

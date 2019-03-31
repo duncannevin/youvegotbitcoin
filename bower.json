@@ -38,6 +38,7 @@
     "bootstrap": "^4.2.1",
     "jquery": "^3.3.1",
     "bitcore-lib": "^0.13.7",
-    "bitcore-mnemonic": "^1.0.1"
+    "bitcore-mnemonic": "^1.0.1",
+    "axios": "^0.18.0"
   }
 }
