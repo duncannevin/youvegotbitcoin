@@ -3,8 +3,8 @@ package com.giftedprimate.emailbitcoin.router
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
-import com.giftedprimate.emailbitcoin.actors.NewWalletActor.CreateWallet
-import com.giftedprimate.emailbitcoin.entities.{CreationForm, FundData}
+import com.giftedprimate.emailbitcoin.actors.WalletActor.CreateWallet
+import com.giftedprimate.emailbitcoin.entities.{CreationForm, FundData, Session}
 import com.giftedprimate.emailbitcoin.validators.{
   ClientDirectives,
   CreateWalletValidator,
@@ -35,9 +35,9 @@ class TransactionRouter @Inject()(
             validateWith(CreateWalletValidator)(creationForm) {
               val reqPublicKey =
                 (newWalletActor ? CreateWallet(creationForm))
-                  .mapTo[FundData]
-              onSuccess(reqPublicKey) { fundData =>
-                complete(StatusCodes.OK, fundData)
+                  .mapTo[Session]
+              onSuccess(reqPublicKey) { session =>
+                redirectTo(s"/getpka?sessionid=${session.sessionId}")
               }
             }
           }

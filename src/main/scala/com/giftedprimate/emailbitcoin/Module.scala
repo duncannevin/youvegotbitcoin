@@ -2,15 +2,14 @@ package com.giftedprimate.emailbitcoin
 
 import akka.actor.{ActorRef, ActorSystem}
 import com.giftedprimate.emailbitcoin.actors.{
-  NewWalletActor,
+  WalletActor,
   NotificationActor,
-  SessionActor,
   TransactionActor
 }
 import com.giftedprimate.emailbitcoin.bitcoin.BitcoinClient
 import com.giftedprimate.emailbitcoin.configuration._
 import com.giftedprimate.emailbitcoin.daos.{
-  EmailBtcTransactionDAO,
+  EBTransactionDAO,
   RecipientWalletDAO,
   SessionDAO
 }
@@ -39,7 +38,7 @@ class Module @Inject()(implicit val ec: ExecutionContext)
     bind(classOf[TransactionLogger])
     bind(classOf[NotificationLogger])
     bind(classOf[RecipientWalletDAO])
-    bind(classOf[EmailBtcTransactionDAO])
+    bind(classOf[EBTransactionDAO])
     bind(classOf[SessionDAO])
     bind(classOf[BitcoinClient])
     bind(classOf[EmailBitcoin])
@@ -54,14 +53,16 @@ class Module @Inject()(implicit val ec: ExecutionContext)
       actorSystem: ActorSystem,
       transactionLog: TransactionLogger,
       recipientWalletDAO: RecipientWalletDAO,
-      transactionDAO: EmailBtcTransactionDAO,
-      @Named("session-actor") sessionActor: ActorRef): ActorRef =
+      sessionDAO: SessionDAO,
+      transactionDAO: EBTransactionDAO,
+      @Named("notification-actor") notificationActor: ActorRef): ActorRef =
     actorSystem.actorOf(
       TransactionActor.props(
         transactionLog,
         recipientWalletDAO,
         transactionDAO,
-        sessionActor
+        sessionDAO,
+        notificationActor
       ))
 
   @Provides
@@ -70,9 +71,11 @@ class Module @Inject()(implicit val ec: ExecutionContext)
   def getNewWalletActor(
       actorSystem: ActorSystem,
       bitcoinClient: BitcoinClient,
-      recipientWalletDAO: RecipientWalletDAO
+      recipientWalletDAO: RecipientWalletDAO,
+      sessionDAO: SessionDAO
   ): ActorRef =
-    actorSystem.actorOf(NewWalletActor.props(bitcoinClient, recipientWalletDAO))
+    actorSystem.actorOf(
+      WalletActor.props(bitcoinClient, recipientWalletDAO, sessionDAO))
 
   @Provides
   @Singleton
@@ -80,20 +83,9 @@ class Module @Inject()(implicit val ec: ExecutionContext)
   def getNotificationActor(actorSystem: ActorSystem,
                            logger: NotificationLogger,
                            recipientWalletDAO: RecipientWalletDAO,
-                           transactionDAO: EmailBtcTransactionDAO): ActorRef =
+                           transactionDAO: EBTransactionDAO): ActorRef =
     actorSystem.actorOf(
       NotificationActor.props(logger, transactionDAO, recipientWalletDAO))
-
-  @Provides
-  @Singleton
-  @Named("session-actor")
-  def getSessionActor(
-      actorSystem: ActorSystem,
-      logger: SessionLogger,
-      sessionDAO: SessionDAO,
-      @Named("notification-actor") notificationActor: ActorRef): ActorRef =
-    actorSystem.actorOf(
-      SessionActor.props(logger, sessionDAO, notificationActor))
 
   @Provides
   def mongoDb(configFactory: EmailBitcoinConfigFactory): MongoDatabase = {

@@ -11,5 +11,9 @@ object ApiError {
   val generic: ApiError =
     new ApiError(StatusCodes.InternalServerError, "Unknown error.")
   def invalidEmail(email: String): ApiError =
-    new ApiError(StatusCodes.BadRequest, s"Email is invalid: $email")
+    new ApiError(StatusCodes.BadRequest, s"Email is invalid: $email.")
+  def noSessionError: ApiError =
+    new ApiError(StatusCodes.BadRequest, "Session does not exist.")
+  def noWalletError: ApiError =
+    new ApiError(StatusCodes.BadRequest, "Wallet does not exist.")
 }

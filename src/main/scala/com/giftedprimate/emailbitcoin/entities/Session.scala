@@ -10,10 +10,14 @@ import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala.bson.codecs.{DEFAULT_CODEC_REGISTRY, Macros}
 
 object Session {
-  def apply(emailBtcTransaction: EmailBtcTransaction): Session =
+  def apply(recipientWallet: RecipientWallet): Session = {
+    val date = DateTime.now.toString
     new Session(UUID.randomUUID().toString,
-                DateTime.now.toString,
-                emailBtcTransaction.publicKey)
+                date,
+                date,
+                recipientWallet.publicKeyAddress,
+                "pending")
+  }
 
   def codecRegistry: CodecRegistry = {
     fromRegistries(
@@ -25,4 +29,8 @@ object Session {
   }
 }
 
-case class Session(sessionId: String, createdAt: String, publicKey: String)
+case class Session(sessionId: String,
+                   createdAt: String,
+                   updatedAt: String,
+                   publicKey: String,
+                   status: String)

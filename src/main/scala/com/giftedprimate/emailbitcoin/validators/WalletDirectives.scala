@@ -5,7 +5,7 @@ import com.giftedprimate.emailbitcoin.messages.ApiError
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-trait WalletDirectives extends Directives {
+trait WalletDirectives extends Directives with ClientDirectives {
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
   import io.circe.generic.auto._
 

@@ -6,11 +6,11 @@ import org.bson.codecs.configuration.CodecRegistries.{
 import org.bson.codecs.configuration.CodecRegistry
 import org.mongodb.scala.bson.codecs.{DEFAULT_CODEC_REGISTRY, Macros}
 
-object EmailBtcTransaction {
+object EBTransaction {
   def codecRegistry: CodecRegistry = {
     fromRegistries(
       fromProviders(
-        Macros.createCodecProvider[EmailBtcTransaction](),
+        Macros.createCodecProvider[EBTransaction](),
         Macros.createCodecProvider[CreationForm]()
       ),
       DEFAULT_CODEC_REGISTRY
@@ -18,7 +18,7 @@ object EmailBtcTransaction {
   }
 }
 
-case class EmailBtcTransaction(
+case class EBTransaction(
     createdAt: String,
     publicKey: String,
     transactionId: String,

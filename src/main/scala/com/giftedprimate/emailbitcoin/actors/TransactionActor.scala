@@ -2,18 +2,18 @@ package com.giftedprimate.emailbitcoin.actors
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.http.scaladsl.model.DateTime
-import com.giftedprimate.emailbitcoin.actors.SessionActor.CreateRecipientSession
+import com.giftedprimate.emailbitcoin.actors.NotificationActor.Notify
 import com.giftedprimate.emailbitcoin.daos.{
-  EmailBtcTransactionDAO,
-  RecipientWalletDAO
+  EBTransactionDAO,
+  RecipientWalletDAO,
+  SessionDAO
 }
-import com.giftedprimate.emailbitcoin.loggers.TransactionLogger
 import com.giftedprimate.emailbitcoin.entities.{
-  EmailBtcTransaction,
+  EBTransaction,
   IncomingTransaction
 }
+import com.giftedprimate.emailbitcoin.loggers.TransactionLogger
 import com.google.inject.Inject
-import org.joda.time.DateTimeZone
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -22,26 +22,29 @@ object TransactionActor {
   final case class NewTransaction(publicKey: String,
                                   transactionId: String,
                                   value: Long)
-  final case class SaveTransaction(transaction: EmailBtcTransaction)
+  final case class SaveTransaction(transaction: EBTransaction)
 
   def props(
       logger: TransactionLogger,
       recipientWalletDAO: RecipientWalletDAO,
-      transactionDAO: EmailBtcTransactionDAO,
-      sessionActor: ActorRef
+      transactionDAO: EBTransactionDAO,
+      sessionDAO: SessionDAO,
+      notificationActor: ActorRef
   ): Props = Props(
     new TransactionActor(logger,
                          recipientWalletDAO,
                          transactionDAO,
-                         sessionActor)
+                         sessionDAO,
+                         notificationActor)
   )
 }
 
 class TransactionActor @Inject()(
     logger: TransactionLogger,
     recipientWalletDAO: RecipientWalletDAO,
-    transactionDAO: EmailBtcTransactionDAO,
-    sessionActor: ActorRef
+    transactionDAO: EBTransactionDAO,
+    sessionDAO: SessionDAO,
+    notificationActor: ActorRef
 ) extends Actor {
   import TransactionActor._
 
@@ -66,7 +69,7 @@ class TransactionActor @Inject()(
       } yield
         recipientWalletOpt match {
           case Some(recipientWallet) =>
-            val transaction = EmailBtcTransaction(
+            val transaction = EBTransaction(
               DateTime.now.toString,
               publicKey,
               transactionId,
@@ -79,7 +82,8 @@ class TransactionActor @Inject()(
     case SaveTransaction(transaction) =>
       for {
         _ <- transactionDAO.save(transaction)
-      } yield sessionActor ! CreateRecipientSession(transaction)
+        session <- sessionDAO.updateStatus(transaction.publicKey, "funded")
+      } yield notificationActor ! Notify(session, transaction)
     case _ =>
       logger.unrecognizedMessageSentToActor()
   }

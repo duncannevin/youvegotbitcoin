@@ -8,7 +8,7 @@ trait ClientDirectives extends Directives {
     complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, page.toString()))
   }
 
-  def redirectTo(route: String, params: Option[String]): StandardRoute = {
+  def redirectTo(route: String): StandardRoute = {
     redirect(route, StatusCodes.PermanentRedirect)
   }
 }

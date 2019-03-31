@@ -2,26 +2,28 @@ package com.giftedprimate.emailbitcoin.actors
 
 import akka.actor.{Actor, Props}
 import com.giftedprimate.emailbitcoin.bitcoin.BitcoinClient
-import com.giftedprimate.emailbitcoin.daos.RecipientWalletDAO
-import com.giftedprimate.emailbitcoin.entities.{CreationForm, FundData}
+import com.giftedprimate.emailbitcoin.daos.{RecipientWalletDAO, SessionDAO}
+import com.giftedprimate.emailbitcoin.entities.{CreationForm, FundData, Session}
 import com.google.inject.Inject
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object NewWalletActor {
+object WalletActor {
   final case class CreateWallet(creationForm: CreationForm)
 
   def props(bitcoinClient: BitcoinClient,
-            recipientWalletDAO: RecipientWalletDAO) = Props(
-    new NewWalletActor(bitcoinClient, recipientWalletDAO)
+            recipientWalletDAO: RecipientWalletDAO,
+            sessionDAO: SessionDAO) = Props(
+    new WalletActor(bitcoinClient, recipientWalletDAO, sessionDAO)
   )
 }
 
-class NewWalletActor @Inject()(
+class WalletActor @Inject()(
     bitcoinClient: BitcoinClient,
-    recipientWalletDAO: RecipientWalletDAO
+    recipientWalletDAO: RecipientWalletDAO,
+    sessionDAO: SessionDAO
 ) extends Actor {
-  import NewWalletActor._
+  import WalletActor._
 
   override def receive: Receive = {
     case CreateWallet(creationForm) =>
@@ -29,8 +31,7 @@ class NewWalletActor @Inject()(
       for {
         recipientWallet <- bitcoinClient.addWallet(creationForm)
         _ <- recipientWalletDAO.save(recipientWallet)
-      } yield
-        s ! FundData(recipientWallet.createForm.recipientEmail,
-                     recipientWallet.publicKeyAddress)
+        session <- sessionDAO.save(Session(recipientWallet))
+      } yield s ! session
   }
 }
