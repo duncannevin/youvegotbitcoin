@@ -8,12 +8,13 @@ import com.giftedprimate.emailbitcoin.entities.{CreationForm, FundData, Session}
 import com.giftedprimate.emailbitcoin.validators.{
   ClientDirectives,
   CreateWalletValidator,
-  ValidatorDirectives,
-  EBDirectives
+  EBDirectives,
+  ValidatorDirectives
 }
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import akka.pattern.ask
+import com.giftedprimate.emailbitcoin.messages.ApiError
 
 class TransactionRouter @Inject()(
     @Named("new-wallet-actor") newWalletActor: ActorRef,
@@ -33,10 +34,9 @@ class TransactionRouter @Inject()(
         post {
           entity(as[CreationForm]) { creationForm =>
             validateWith(CreateWalletValidator)(creationForm) {
-              val reqPublicKey =
-                (newWalletActor ? CreateWallet(creationForm))
-                  .mapTo[Session]
-              onSuccess(reqPublicKey) { session =>
+              handleActor(
+                (newWalletActor ? CreateWallet(creationForm)).mapTo[Session])(
+                _ => ApiError.generic) { session =>
                 complete(s"/getpka?sessionid=${session.sessionId}")
               }
             }

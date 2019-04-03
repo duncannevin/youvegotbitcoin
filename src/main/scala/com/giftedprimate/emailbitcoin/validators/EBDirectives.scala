@@ -1,7 +1,11 @@
 package com.giftedprimate.emailbitcoin.validators
 
 import akka.http.scaladsl.server.{Directive1, Directives, Route}
-import com.giftedprimate.emailbitcoin.entities.{RecipientWallet, Session}
+import com.giftedprimate.emailbitcoin.entities.{
+  ActorFailed,
+  RecipientWallet,
+  Session
+}
 import com.giftedprimate.emailbitcoin.loggers.DirectiveLogger
 import com.giftedprimate.emailbitcoin.messages.ApiError
 import play.twirl.api.HtmlFormat
@@ -34,4 +38,13 @@ trait EBDirectives extends Directives with ClientDirectives {
         case _ => toHtml(html.serverError())
       }
     }
+
+  def handleActor[T](f: Future[T])(e: Throwable => ApiError): Directive1[T] = {
+    onSuccess(f) flatMap {
+      case actorFailed: ActorFailed =>
+        val apiError = e(actorFailed)
+        complete(apiError.statusCode, apiError.message)
+      case t => provide(t)
+    }
+  }
 }
