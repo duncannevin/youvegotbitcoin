@@ -83,30 +83,36 @@ class Module @Inject()(implicit val ec: ExecutionContext)
   def getNotificationActor(actorSystem: ActorSystem,
                            logger: NotificationLogger,
                            recipientWalletDAO: RecipientWalletDAO,
-                           transactionDAO: EBTransactionDAO): ActorRef =
+                           transactionDAO: EBTransactionDAO,
+                           siteLocationConfig: SiteLocationConfig): ActorRef =
     actorSystem.actorOf(
-      NotificationActor.props(logger, transactionDAO, recipientWalletDAO))
+      NotificationActor
+        .props(logger, transactionDAO, recipientWalletDAO, siteLocationConfig))
 
   @Provides
-  def mongoDb(configFactory: EmailBitcoinConfigFactory): MongoDatabase = {
+  def mongoDb(configFactory: EBConfigFactory): MongoDatabase = {
     val mongoClient: MongoClient = MongoClient(
       configFactory.mongoConfig.location)
     mongoClient.getDatabase(configFactory.mongoConfig.name)
   }
 
   @Provides
-  def serverConfig(configFactory: EmailBitcoinConfigFactory): ServerConfig =
+  def serverConfig(configFactory: EBConfigFactory): ServerConfig =
     configFactory.serverConfig
 
   @Provides
-  def bitcoinConfig(configFactory: EmailBitcoinConfigFactory): BitcoinConfig =
+  def bitcoinConfig(configFactory: EBConfigFactory): BitcoinConfig =
     configFactory.bitcoinConfig
 
   @Provides
-  def mongoConfig(configFactory: EmailBitcoinConfigFactory): MongoConfig =
+  def mongoConfig(configFactory: EBConfigFactory): MongoConfig =
     configFactory.mongoConfig
 
   @Provides
-  def systemConfig(configFactory: EmailBitcoinConfigFactory): SystemConfig =
+  def systemConfig(configFactory: EBConfigFactory): SystemConfig =
     configFactory.systemConfig
+
+  @Provides
+  def siteLocationConfig(configFactory: EBConfigFactory): SiteLocationConfig =
+    configFactory.siteLocationConfig
 }

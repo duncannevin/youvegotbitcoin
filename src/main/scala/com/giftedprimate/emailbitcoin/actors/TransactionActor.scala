@@ -59,6 +59,7 @@ class TransactionActor @Inject()(
         transactionOpt match {
           case Some(_) => logger.existingTransaction(transactionId)
           case None =>
+            logger.transactionPaid(transactionId)
             self ! NewTransaction(publicKey,
                                   transactionId,
                                   tx.getValue(wallet).value)

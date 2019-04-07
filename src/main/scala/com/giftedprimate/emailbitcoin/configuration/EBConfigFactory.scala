@@ -4,7 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.duration.FiniteDuration
 
-class EmailBitcoinConfigFactory @Inject()() {
+class EBConfigFactory @Inject()() {
   private val config: Config = ConfigFactory.load()
 
   private def getConfig(path: String): String = {
@@ -14,6 +14,11 @@ class EmailBitcoinConfigFactory @Inject()() {
   private def getConfig[T](path: String, converter: String => T): T = {
     converter(sys.env.getOrElse(path.replace(".", "_"), getConfig(path)))
   }
+
+  val siteLocationConfig: SiteLocationConfig = SiteLocationConfig(
+    // todo -> add the site url to environment for deployment
+    url = getConfig("emailbitcoin.location.url")
+  )
 
   val serverConfig: ServerConfig = ServerConfig(
     host = getConfig("emailbitcoin.server.host", _.toString),
