@@ -34,9 +34,9 @@ class TransactionRouter @Inject()(
         post {
           entity(as[CreationForm]) { creationForm =>
             validateWith(CreateWalletValidator)(creationForm) {
-              handleActor(
-                (newWalletActor ? CreateWallet(creationForm)).mapTo[Session])(
-                _ => ApiError.generic) { session =>
+              handleActor {
+                (newWalletActor ? CreateWallet(creationForm)).mapTo[Session]
+              }(_ => ApiError.generic) { session =>
                 complete(s"/getpka?sessionid=${session.sessionId}")
               }
             }

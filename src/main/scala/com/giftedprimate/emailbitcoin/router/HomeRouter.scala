@@ -3,6 +3,7 @@ package com.giftedprimate.emailbitcoin.router
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.{Directives, Route}
 import com.giftedprimate.emailbitcoin.daos.{RecipientWalletDAO, SessionDAO}
+import com.giftedprimate.emailbitcoin.utils.QRCodeUtil.getQRCode
 import com.giftedprimate.emailbitcoin.validators.{
   ClientDirectives,
   EBDirectives,
@@ -32,7 +33,9 @@ class HomeRouter @Inject()(
       parameter('sessionid) { sessionId =>
         handleSessionWallet(sessionDAO.findWithWallet(sessionId))("pending") {
           (_, recipientWallet) =>
-            html.payTransaction.render(recipientWallet)
+            html.payTransaction.render(
+              recipientWallet.publicKeyAddress,
+              getQRCode(recipientWallet.publicKeyAddress))
         }
       }
     } ~ pathPrefix("css") {

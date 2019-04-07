@@ -33,18 +33,19 @@ trait EBDirectives extends Directives with ClientDirectives {
           toHtml(html.serverError.render())
         case (Some(session), Some(wallet)) if session.status == desiredStatus =>
           toHtml(handler(session, wallet))
-        case (Some(session), Some(wallet)) if session.status != desiredStatus =>
+        case (Some(session), Some(_)) if session.status != desiredStatus =>
           toHtml(html.badRequest.render())
-        case _ => toHtml(html.serverError())
+        case _ =>
+          logger.unknownReason
+          toHtml(html.serverError())
       }
     }
 
-  def handleActor[T](f: Future[T])(e: Throwable => ApiError): Directive1[T] = {
+  def handleActor[T](f: Future[T])(e: Throwable => ApiError): Directive1[T] =
     onSuccess(f) flatMap {
       case actorFailed: ActorFailed =>
         val apiError = e(actorFailed)
         complete(apiError.statusCode, apiError.message)
       case t => provide(t)
     }
-  }
 }

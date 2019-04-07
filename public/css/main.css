@@ -2,3 +2,12 @@ html, body {}
 
 #address-display {
 }
+
+.row {
+    justify-content: center;
+    align-items: center;
+}
+
+p, h1 {
+    display: inline-block;
+}

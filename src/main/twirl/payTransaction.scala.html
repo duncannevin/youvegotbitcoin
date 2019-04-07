@@ -1,15 +1,19 @@
 @import com.giftedprimate.emailbitcoin.entities.RecipientWallet
-@(wallet: RecipientWallet)
+@(publicKeyAddress: String, qrCode: String)
 
 @index() {
   <div class="row">
     <div id="address-display" class="col-lg-8 col-md-12">
+        <div class="row mb-3">
+            <img src="data:image/png;base64,@qrCode" alt="@publicKeyAddress">
+        </div>
         <div class="input-group mb-3">
-            <input id="address-display-input" type="text" class="form-control" value="@wallet.publicKeyAddress" aria-label="address" aria-describedby="pay-copy" disabled>
+            <input id="address-display-input" type="text" class="form-control" value="@publicKeyAddress" aria-label="address" aria-describedby="pay-copy" disabled>
             <div class="input-group-append">
-                <span class="input-group-text" id="pay-copy">Copy</span>
+                <button class="input-group-text" id="pay-copy">Copy</button>
             </div>
         </div>
     </div>
   </div>
+  <script src="/js/pay.js"></script>
 }

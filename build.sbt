@@ -45,7 +45,10 @@ libraryDependencies ++= Seq(
 
   "com.github.nscala-time" %% "nscala-time" % "2.22.0",
 
-  "com.lihaoyi" %% "scalatags" % "0.6.7"
+  "com.lihaoyi" %% "scalatags" % "0.6.7",
+
+  "com.google.zxing" % "core" % "3.3.0",
+  "com.google.zxing" % "javase" % "3.3.0"
 )
 
 mainClass in Global := Some("com.giftedprimate.emailbitcoin.Main")
