@@ -3,7 +3,8 @@ import com.google.inject.Inject
 
 class Routes @Inject()(
     homeRouter: HomeRouter,
-    transactionRouter: TransactionRouter
+    transactionRouter: TransactionRouter,
+    WSRouter: WSRouter
 ) {
-  def routes: Seq[PartialRoute] = Seq(homeRouter, transactionRouter)
+  def routes: Seq[PartialRoute] = Seq(homeRouter, transactionRouter, WSRouter)
 }

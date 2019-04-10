@@ -2,9 +2,10 @@ package com.giftedprimate.emailbitcoin
 
 import akka.actor.{ActorRef, ActorSystem}
 import com.giftedprimate.emailbitcoin.actors.{
-  WalletActor,
   NotificationActor,
-  TransactionActor
+  TransactionActor,
+  WSSupervisorActor,
+  WalletActor
 }
 import com.giftedprimate.emailbitcoin.bitcoin.BitcoinClient
 import com.giftedprimate.emailbitcoin.configuration._
@@ -17,7 +18,8 @@ import com.giftedprimate.emailbitcoin.loggers._
 import com.giftedprimate.emailbitcoin.router.{
   HomeRouter,
   Routes,
-  TransactionRouter
+  TransactionRouter,
+  WSRouter
 }
 import com.google.inject.{AbstractModule, Inject, Provides}
 import com.sandinh.akuice.AkkaGuiceSupport
@@ -34,6 +36,7 @@ class Module @Inject()(implicit val ec: ExecutionContext)
 
     bind(classOf[HomeRouter]).asEagerSingleton()
     bind(classOf[TransactionRouter]).asEagerSingleton()
+    bind(classOf[WSRouter]).asEagerSingleton()
     bind(classOf[ServerLogger]).asEagerSingleton()
     bind(classOf[TransactionLogger]).asEagerSingleton()
     bind(classOf[NotificationLogger]).asEagerSingleton()
@@ -88,6 +91,15 @@ class Module @Inject()(implicit val ec: ExecutionContext)
     actorSystem.actorOf(
       NotificationActor
         .props(logger, transactionDAO, recipientWalletDAO, siteLocationConfig))
+
+  @Provides
+  @Singleton
+  @Named("ws-supervisor-actor")
+  def getWSSupervisorActor(actorSystem: ActorSystem,
+                           transactionDAO: EBTransactionDAO): ActorRef =
+    actorSystem.actorOf(
+      WSSupervisorActor.props(actorSystem, transactionDAO)
+    )
 
   @Provides
   def mongoDb(configFactory: EBConfigFactory): MongoDatabase = {
