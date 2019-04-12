@@ -11,7 +11,7 @@ import com.google.inject.Inject
 import akka.pattern.ask
 import akka.stream.scaladsl.Flow
 import akka.util.Timeout
-import com.giftedprimate.emailbitcoin.entities.GetActorFlow
+import com.giftedprimate.emailbitcoin.entities.{ActorFailed, GetActorFlow}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.FiniteDuration
@@ -34,10 +34,14 @@ class WSSupervisorActor @Inject()(actorSystem: ActorSystem,
   override def receive: Receive = receive()
 
   def receive(s: ActorRef = ActorRef.noSender): Receive = {
-    case GetFlow(actorName) if actorName == "transaction-status" =>
+    case GetFlow(actorName) =>
       context.become(receive(sender))
-      self ! CreateFlow(
-        actorSystem.actorOf(TransactionStatusActor.props(transactionDAO)))
+      if (actorName == "transaction-status") {
+        self ! CreateFlow(
+          actorSystem.actorOf(TransactionStatusActor.props(transactionDAO)))
+      } else {
+        throw ActorFailed(s"$actorName is not registered in WSCreatorActor")
+      }
     case CreateFlow(actorRef) =>
       for {
         flow <- (actorRef ? GetActorFlow)
