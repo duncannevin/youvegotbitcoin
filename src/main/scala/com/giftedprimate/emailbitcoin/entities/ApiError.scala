@@ -1,4 +1,4 @@
-package com.giftedprimate.emailbitcoin.messages
+package com.giftedprimate.emailbitcoin.entities
 
 import akka.http.scaladsl.model.{StatusCode, StatusCodes}
 

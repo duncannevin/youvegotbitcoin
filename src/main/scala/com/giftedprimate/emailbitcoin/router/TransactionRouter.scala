@@ -4,8 +4,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
 import com.giftedprimate.emailbitcoin.actors.WalletActor.CreateWallet
-import com.giftedprimate.emailbitcoin.entities.{CreationForm, Session}
-import com.giftedprimate.emailbitcoin.messages.ApiError
+import com.giftedprimate.emailbitcoin.entities.{ApiError, CreationForm, Session}
 import com.giftedprimate.emailbitcoin.validators.{
   ClientDirectives,
   CreateWalletValidator,

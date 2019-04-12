@@ -3,11 +3,11 @@ package com.giftedprimate.emailbitcoin.validators
 import akka.http.scaladsl.server.{Directive1, Directives, Route}
 import com.giftedprimate.emailbitcoin.entities.{
   ActorFailed,
+  ApiError,
   RecipientWallet,
   Session
 }
 import com.giftedprimate.emailbitcoin.loggers.DirectiveLogger
-import com.giftedprimate.emailbitcoin.messages.ApiError
 import play.twirl.api.HtmlFormat
 
 import scala.concurrent.Future
