@@ -4,7 +4,6 @@ import akka.actor.{ActorRef, ActorSystem}
 import com.giftedprimate.emailbitcoin.actors.{
   NotificationActor,
   TransactionActor,
-  WSSupervisorActor,
   WalletActor
 }
 import com.giftedprimate.emailbitcoin.bitcoin.BitcoinClient
@@ -91,15 +90,6 @@ class Module @Inject()(implicit val ec: ExecutionContext)
     actorSystem.actorOf(
       NotificationActor
         .props(logger, transactionDAO, recipientWalletDAO, siteLocationConfig))
-
-  @Provides
-  @Singleton
-  @Named("ws-supervisor-actor")
-  def getWSSupervisorActor(actorSystem: ActorSystem,
-                           transactionDAO: EBTransactionDAO): ActorRef =
-    actorSystem.actorOf(
-      WSSupervisorActor.props(actorSystem, transactionDAO)
-    )
 
   @Provides
   def mongoDb(configFactory: EBConfigFactory): MongoDatabase = {

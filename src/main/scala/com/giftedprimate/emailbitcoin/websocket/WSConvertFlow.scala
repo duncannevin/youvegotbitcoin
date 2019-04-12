@@ -1,12 +1,17 @@
 package com.giftedprimate.emailbitcoin.websocket
 
 import akka.NotUsed
-import akka.actor.{ActorContext, ActorRef, ActorSystem}
+import akka.actor.AbstractActor.Receive
+import akka.actor.{Actor, ActorContext, ActorRef, ActorSystem}
 import akka.http.scaladsl.model.ws.{BinaryMessage, Message, TextMessage}
 import akka.stream.scaladsl.GraphDSL.Implicits._
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, FlowShape, OverflowStrategy}
-import com.giftedprimate.emailbitcoin.entities.{JsonParseException, WSRequest}
+import com.giftedprimate.emailbitcoin.entities.{
+  GetActorFlow,
+  JsonParseException,
+  WSRequest
+}
 import io.circe.parser._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,11 +21,18 @@ import scala.concurrent.duration.FiniteDuration
 trait WSConvertFlow {
   val self: ActorRef
   val context: ActorContext
+  def sender: ActorRef
 
   implicit val system: ActorSystem = context.system
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   def convert(WSRequest: WSRequest): Any
+
+  def receiveFlow: Actor.Receive = {
+    case GetActorFlow() =>
+      val s = sender
+      s ! flow
+  }
 
   def msgParser(msg: String): Any = parse(msg) match {
     case Left(error) => JsonParseException(error.getMessage)

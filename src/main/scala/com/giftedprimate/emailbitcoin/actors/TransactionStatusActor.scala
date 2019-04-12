@@ -3,7 +3,6 @@ package com.giftedprimate.emailbitcoin.actors
 import akka.actor.{Actor, Props}
 import com.giftedprimate.emailbitcoin.daos.EBTransactionDAO
 import com.giftedprimate.emailbitcoin.entities.{
-  GetActorFlow,
   UnrecognizedMsgException,
   WSRequest
 }
@@ -31,9 +30,8 @@ class TransactionStatusActor @Inject()(
       UnrecognizedMsgException(s"not recognized $action")
   }
 
-  override def receive: Receive = {
-    case GetActorFlow => sender ! flow
-    case Foo(msg)     => out ! s"YEA, you are so $msg"
-    case _            => out ! "not something I understand"
+  def receive: Receive = receiveFlow orElse {
+    case Foo(msg) => out ! s"YEA, you are so $msg"
+    case _        => out ! "not something I understand"
   }
 }
