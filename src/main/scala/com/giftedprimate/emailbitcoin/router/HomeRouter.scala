@@ -31,7 +31,7 @@ class HomeRouter @Inject()(
       }
     } ~ pathPrefix("getpka") {
       parameter('sessionid) { sessionId =>
-        handleSessionWallet(sessionDAO.findWithWallet(sessionId))("pending") {
+        handleSessionWalletHtml(sessionDAO.findWithWallet(sessionId))("pending") {
           (_, recipientWallet) =>
             html.payTransaction.render(
               recipientWallet.publicKeyAddress,

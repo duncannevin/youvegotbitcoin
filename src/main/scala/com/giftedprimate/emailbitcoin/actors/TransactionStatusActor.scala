@@ -3,6 +3,7 @@ package com.giftedprimate.emailbitcoin.actors
 import akka.actor.{Actor, Props}
 import com.giftedprimate.emailbitcoin.daos.EBTransactionDAO
 import com.giftedprimate.emailbitcoin.entities.{
+  Session,
   UnrecognizedMsgException,
   WSRequest
 }
@@ -13,12 +14,13 @@ object TransactionStatusActor {
   final case class GetTransactionStatus(sessionId: String)
   final case class Foo(msg: String)
 
-  def props(transactionDAO: EBTransactionDAO): Props = Props(
-    new TransactionStatusActor(transactionDAO)
+  def props(session: Session, transactionDAO: EBTransactionDAO): Props = Props(
+    new TransactionStatusActor(session, transactionDAO)
   )
 }
 
 class TransactionStatusActor @Inject()(
+    session: Session,
     transactionDAO: EBTransactionDAO
 ) extends Actor
     with WSConvertFlow {
@@ -31,7 +33,7 @@ class TransactionStatusActor @Inject()(
   }
 
   def receive: Receive = receiveFlow orElse {
-    case Foo(msg) => out ! s"YEA, you are so $msg"
+    case Foo(msg) => out ! s"YEA, you are so $msg ${session.publicKey}"
     case _        => out ! "not something I understand"
   }
 }
