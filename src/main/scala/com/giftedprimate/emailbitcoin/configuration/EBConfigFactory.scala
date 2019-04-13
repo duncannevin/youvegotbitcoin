@@ -38,4 +38,8 @@ class EBConfigFactory @Inject()() {
     timeout = FiniteDuration(getConfig("emailbitcoin.system.timeout", _.toInt),
                              "seconds")
   )
+
+  val blockExplorerConfig: BlockExplorerConfig = BlockExplorerConfig(
+    location = getConfig("emailbitcoin.blockExplorer.location", _.toString)
+  )
 }

@@ -17,6 +17,8 @@ val twirlVersion = "1.4.0"
 
 lazy val root = (project in file(".")).enablePlugins(SbtTwirl)
 
+resolvers += Resolver.sonatypeRepo("releases")
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,

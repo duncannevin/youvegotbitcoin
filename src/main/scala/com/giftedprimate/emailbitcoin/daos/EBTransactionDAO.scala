@@ -34,5 +34,12 @@ class EBTransactionDAO @Inject()(
         .toFutureOption()
     } yield maybeTransaction
 
+  def findAll(publicKey: String): Future[Seq[EBTransaction]] =
+    for {
+      transactions <- collection
+        .find(equal("publicKey", publicKey))
+        .toFuture()
+    } yield transactions
+
   indexCollection(logger)
 }
