@@ -32,6 +32,7 @@ trait WSConvertFlow {
     case GetActorFlow() =>
       val s = sender
       s ! flow
+    case JsonParseException(msg) => out ! s"json parse error: $msg"
   }
 
   def msgParser(msg: String): Any = parse(msg) match {
