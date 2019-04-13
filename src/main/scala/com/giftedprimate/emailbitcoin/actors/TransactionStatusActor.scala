@@ -26,8 +26,7 @@ object TransactionStatusActor {
 class TransactionStatusActor @Inject()(
     session: Session,
     transactionDAO: EBTransactionDAO
-) extends Actor
-    with WSConvertFlow {
+) extends WSConvertFlow {
   import TransactionStatusActor._
   import io.circe.generic.auto._
 
@@ -37,7 +36,7 @@ class TransactionStatusActor @Inject()(
       UnrecognizedMsgException(s"not recognized $action")
   }
 
-  def receive: Receive = receiveFlow orElse {
+  override def websocketReceive: Receive = {
     case StatusCheck() =>
       for {
         transactions <- transactionDAO.findAll(session.publicKey)
