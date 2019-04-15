@@ -6,6 +6,7 @@ import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.stream.scaladsl.Flow
 import com.giftedprimate.emailbitcoin.actors.TransactionStatusActor
+import com.giftedprimate.emailbitcoin.bitcoin.BitcoinClient
 import com.giftedprimate.emailbitcoin.daos.{EBTransactionDAO, SessionDAO}
 import com.giftedprimate.emailbitcoin.entities.{ApiError, GetActorFlow}
 import com.giftedprimate.emailbitcoin.validators.EBDirectives
@@ -16,7 +17,8 @@ import scala.util.{Failure, Success}
 class WSRouter @Inject()(
     ebTransactionDAO: EBTransactionDAO,
     sessionDAO: SessionDAO,
-    actorSystem: ActorSystem
+    actorSystem: ActorSystem,
+    bitcoinClient: BitcoinClient
 ) extends PartialRoute
     with EBDirectives {
   override def router: Route = pathPrefix("ws") {
@@ -27,7 +29,8 @@ class WSRouter @Inject()(
             val transactionStatusActor =
               actorSystem.actorOf(
                 TransactionStatusActor.props(sessionWallet.session,
-                                             ebTransactionDAO))
+                                             ebTransactionDAO,
+                                             bitcoinClient))
             val futureFlow = (transactionStatusActor ? GetActorFlow())
               .mapTo[Flow[Message, Message, _]]
             onComplete(futureFlow) {

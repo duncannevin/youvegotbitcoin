@@ -10,10 +10,16 @@ import com.giftedprimate.emailbitcoin.configuration.{
 }
 import com.giftedprimate.emailbitcoin.daos.RecipientWalletDAO
 import com.giftedprimate.emailbitcoin.entities
-import com.giftedprimate.emailbitcoin.entities.{CreationForm, RecipientWallet}
+import com.giftedprimate.emailbitcoin.entities.{
+  CreationForm,
+  EBBlock,
+  RecipientWallet
+}
 import com.giftedprimate.emailbitcoin.loggers.BitcoinLogger
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import io.circe.parser._
+import io.circe.generic.auto._
 import org.bitcoinj.core._
 import org.bitcoinj.core.listeners.PeerDataEventListener
 import org.bitcoinj.net.discovery.DnsDiscovery
@@ -25,6 +31,7 @@ import org.bitcoinj.utils.BriefLogFormatter
 import org.bitcoinj.wallet.listeners.WalletCoinsReceivedEventListener
 import org.bitcoinj.wallet.{DeterministicSeed, Wallet}
 
+import sys.process._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -109,6 +116,11 @@ class BitcoinClient @Inject()(
     peerGroup.addWallet(wallet)
     logger.watchingWallet(recipientWallet)
     Future.successful(recipientWallet)
+  }
+
+  def getRawTransaction(txId: String): Option[EBBlock] = {
+    val raw = s"bitcoin-cli gettransaction $txId".!!
+    parse(raw).right.toOption.flatMap(_.as[EBBlock].right.toOption)
   }
 
   private def addExistingWallets(wallets: Seq[RecipientWallet]): Seq[Unit] =

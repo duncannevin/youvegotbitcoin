@@ -1,6 +1,7 @@
 package com.giftedprimate.emailbitcoin.actors
 
 import akka.actor.{Actor, Props}
+import com.giftedprimate.emailbitcoin.bitcoin.BitcoinClient
 import com.giftedprimate.emailbitcoin.daos.EBTransactionDAO
 import com.giftedprimate.emailbitcoin.entities.{
   Session,
@@ -18,14 +19,17 @@ object TransactionStatusActor {
   final case class GetTransactionStatus(sessionId: String)
   final case class StatusCheck()
 
-  def props(session: Session, transactionDAO: EBTransactionDAO): Props = Props(
-    new TransactionStatusActor(session, transactionDAO)
+  def props(session: Session,
+            transactionDAO: EBTransactionDAO,
+            bitcoinClient: BitcoinClient): Props = Props(
+    new TransactionStatusActor(session, transactionDAO, bitcoinClient)
   )
 }
 
 class TransactionStatusActor @Inject()(
     session: Session,
-    transactionDAO: EBTransactionDAO
+    transactionDAO: EBTransactionDAO,
+    bitcoinClient: BitcoinClient
 ) extends WSConvertFlow {
   import TransactionStatusActor._
   import io.circe.generic.auto._
@@ -40,8 +44,11 @@ class TransactionStatusActor @Inject()(
     case StatusCheck() =>
       for {
         transactions <- transactionDAO.findAll(session.publicKey)
+        blocks = transactions.flatMap { transaction =>
+          bitcoinClient.getRawTransaction(transaction.transactionId)
+        }
       } yield {
-        out ! TransactionStatus(session.sessionId, transactions).asJson
+        out ! TransactionStatus(session.sessionId, transactions, blocks).asJson
           .toString()
       }
     case _ => out ! "not something I understand"

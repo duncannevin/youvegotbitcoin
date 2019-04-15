@@ -8,4 +8,5 @@ object TransactionStatus {
 //    deriveEncoder[TransactionStatus]
 }
 case class TransactionStatus(sessionId: String,
-                             transactions: Seq[EBTransaction])
+                             transactions: Seq[EBTransaction],
+                             blocks: Seq[EBBlock])
