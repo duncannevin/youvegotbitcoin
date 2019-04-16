@@ -29,14 +29,20 @@ class HomeRouter @Inject()(
       get {
         toHtml(html.createTransaction.render())
       }
-    } ~ pathPrefix("paytransaction") {
-      parameter('sessionid) { sessionId =>
+    } ~ parameter('sessionid) { sessionId =>
+      pathPrefix("pay") {
         handleSessionWalletHtml(sessionDAO.findWithWallet(sessionId))("pending") {
           (_, recipientWallet) =>
             html.payTransaction.render(
               recipientWallet.publicKeyAddress,
               getQRCode(recipientWallet.publicKeyAddress))
         }
+      } ~ pathPrefix("sender") {
+        path("foo") {
+          complete("bar")
+        }
+      } ~ pathPrefix("recipient") {
+        ???
       }
     } ~ pathPrefix("css") {
       getFromDirectory("public/css")

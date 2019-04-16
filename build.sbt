@@ -52,7 +52,7 @@ libraryDependencies ++= Seq(
   "com.google.zxing" % "core" % "3.3.0",
   "com.google.zxing" % "javase" % "3.3.0",
 
-  "com.github.giftedprimate" % "scala_opennode_2.12" % "0.3"
+  "com.github.giftedprimate" %% "scala_opennode" % "0.3"
 )
 
 mainClass in Global := Some("com.giftedprimate.emailbitcoin.Main")
