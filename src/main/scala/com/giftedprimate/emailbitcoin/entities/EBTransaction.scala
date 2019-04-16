@@ -1,6 +1,4 @@
 package com.giftedprimate.emailbitcoin.entities
-import io.circe.Encoder
-import io.circe.generic.semiauto._
 import org.bson.codecs.configuration.CodecRegistries.{
   fromProviders,
   fromRegistries

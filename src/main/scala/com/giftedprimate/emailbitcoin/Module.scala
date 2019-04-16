@@ -117,8 +117,4 @@ class Module @Inject()(implicit val ec: ExecutionContext)
   @Provides
   def siteLocationConfig(configFactory: EBConfigFactory): SiteLocationConfig =
     configFactory.siteLocationConfig
-
-  @Provides
-  def blockExplorerConfig(configFactory: EBConfigFactory): BlockExplorerConfig =
-    configFactory.blockExplorerConfig
 }

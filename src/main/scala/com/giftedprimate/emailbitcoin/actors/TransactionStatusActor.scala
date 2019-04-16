@@ -35,7 +35,7 @@ class TransactionStatusActor @Inject()(
   import io.circe.generic.auto._
 
   override def convert(wsRequest: WSRequest): Any = wsRequest match {
-    case WSRequest(action) if action == "status-check" => StatusCheck()
+    case WSRequest(action) if action == "check-status" => StatusCheck()
     case WSRequest(action: String) =>
       UnrecognizedMsgException(s"not recognized $action")
   }

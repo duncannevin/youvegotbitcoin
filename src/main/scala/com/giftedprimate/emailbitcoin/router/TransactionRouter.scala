@@ -35,7 +35,7 @@ class TransactionRouter @Inject()(
               handleActor {
                 (newWalletActor ? CreateWallet(creationForm)).mapTo[Session]
               }(_ => ApiError.generic) { session =>
-                complete(s"/getpka?sessionid=${session.sessionId}")
+                complete(s"/paytransaction?sessionid=${session.sessionId}")
               }
             }
           }

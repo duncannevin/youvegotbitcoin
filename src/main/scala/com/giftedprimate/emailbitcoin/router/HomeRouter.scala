@@ -29,7 +29,7 @@ class HomeRouter @Inject()(
       get {
         toHtml(html.createTransaction.render())
       }
-    } ~ pathPrefix("getpka") {
+    } ~ pathPrefix("paytransaction") {
       parameter('sessionid) { sessionId =>
         handleSessionWalletHtml(sessionDAO.findWithWallet(sessionId))("pending") {
           (_, recipientWallet) =>
