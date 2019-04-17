@@ -40,21 +40,21 @@ class HomeRouter @Inject()(
                 toHtml(html.payTransaction.render(publicKeyAddress,
                                                   getQRCode(publicKeyAddress)))
             }
-          } ~ pathPrefix("sender") {
-            path("status") {
-              handleStatus(rawSessionWallet, "funded", isHtml = true) {
-                sessionWallet =>
+          } ~ handleStatus(rawSessionWallet, "funded", isHtml = true) {
+            sessionWallet =>
+              pathPrefix("sender") {
+                path("status") {
                   toHtml(html.senderStatus.render())
+                }
+              } ~ pathPrefix("recipient") {
+                ???
+              } ~ pathPrefix("recover") {
+                path("seed") {
+                  ???
+                } ~ path("address") {
+                  ???
+                }
               }
-            }
-          } ~ pathPrefix("recipient") {
-            ???
-          } ~ pathPrefix("recover") {
-            path("seed") {
-              ???
-            } ~ path("address") {
-              ???
-            }
           }
       }
     } ~ pathPrefix("css") {
