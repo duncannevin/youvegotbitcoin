@@ -1,7 +1,7 @@
 package com.giftedprimate.emailbitcoin.validators
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.{Directive1, Directives, Route}
+import akka.http.scaladsl.server.{Directive1, Directives, Route, StandardRoute}
 import com.giftedprimate.emailbitcoin.entities.{
   ActorFailed,
   ApiError,
@@ -29,41 +29,50 @@ trait EBDirectives extends Directives with ClientDirectives {
   def handleWithGeneric[T](f: Future[T]): Directive1[T] =
     handle(f)(_ => ApiError.generic)
 
-  def handleSessionWallet[T](f: Future[T]): Directive1[SessionWallet] =
+  def handleSessionWallet[T](
+      f: Future[T],
+      isHtml: Boolean = false): Directive1[SessionWallet] = {
     onComplete(f) flatMap {
       case Success(t) =>
         t match {
           case (Some(session: Session), None) =>
             logger.sessionHasNoWallet(session)
-            complete(ApiError.noWalletError.statusCode,
-                     ApiError.noWalletError.message)
+            if (isHtml) {
+              toHtml(html.serverError.render())
+            } else {
+              complete(ApiError.noWalletError.statusCode,
+                       ApiError.noWalletError.message)
+            }
           case (Some(session: Session),
                 Some(recipientWallet: RecipientWallet)) =>
             provide(SessionWallet(session, recipientWallet))
           case _ =>
             logger.unknownReason
-            complete(ApiError.noSessionError.statusCode,
-                     ApiError.noSessionError.message)
+            if (isHtml) {
+              toHtml(html.badRequest())
+            } else {
+              complete(ApiError.noSessionError.statusCode,
+                       ApiError.noSessionError.message)
+            }
         }
       case Failure(error) =>
         complete(ApiError.generic.statusCode, ApiError.generic.message)
     }
+  }
 
-  def handleSessionWalletHtml[T](f: Future[T])(desiredStatus: String)(
-      handler: (Session, RecipientWallet) => HtmlFormat.Appendable): Route =
-    handle(f)(_ => ApiError.generic) { t =>
-      t.asInstanceOf[(Option[Session], Option[RecipientWallet])] match {
-        case (Some(session), None) =>
-          logger.sessionHasNoWallet(session)
+  def handleStatus(sessionWallet: SessionWallet,
+                   desiredStatus: String,
+                   isHtml: Boolean = false): Directive1[SessionWallet] =
+    sessionWallet.session.status match {
+      case status if status == desiredStatus => provide(sessionWallet)
+      case status if status != desiredStatus => toHtml(html.badRequest.render())
+      case _ =>
+        if (isHtml) {
           toHtml(html.serverError.render())
-        case (Some(session), Some(wallet)) if session.status == desiredStatus =>
-          toHtml(handler(session, wallet))
-        case (Some(session), Some(_)) if session.status != desiredStatus =>
-          toHtml(html.badRequest.render())
-        case _ =>
-          logger.unknownReason
-          toHtml(html.serverError())
-      }
+        } else {
+          complete(ApiError.noSessionError.statusCode,
+                   ApiError.noSessionError.message)
+        }
     }
 
   def handleActor[T](f: Future[T])(e: Throwable => ApiError): Directive1[T] =

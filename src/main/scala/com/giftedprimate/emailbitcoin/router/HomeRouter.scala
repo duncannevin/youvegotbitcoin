@@ -11,6 +11,7 @@ import com.giftedprimate.emailbitcoin.validators.{
 }
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
+import com.github.scala_opennode._
 
 @Singleton
 class HomeRouter @Inject()(
@@ -23,26 +24,38 @@ class HomeRouter @Inject()(
     with EBDirectives
     with ValidatorDirectives
     with ClientDirectives {
-
   override def router: Route =
     pathEndOrSingleSlash {
       get {
         toHtml(html.createTransaction.render())
       }
     } ~ parameter('sessionid) { sessionId =>
-      pathPrefix("pay") {
-        handleSessionWalletHtml(sessionDAO.findWithWallet(sessionId))("pending") {
-          (_, recipientWallet) =>
-            html.payTransaction.render(
-              recipientWallet.publicKeyAddress,
-              getQRCode(recipientWallet.publicKeyAddress))
-        }
-      } ~ pathPrefix("sender") {
-        path("foo") {
-          complete("bar")
-        }
-      } ~ pathPrefix("recipient") {
-        ???
+      handleSessionWallet(sessionDAO.findWithWallet(sessionId), isHtml = true) {
+        rawSessionWallet =>
+          pathPrefix("pay") {
+            handleStatus(rawSessionWallet, "pending", isHtml = true) {
+              sessionWallet =>
+                val publicKeyAddress =
+                  sessionWallet.recipientWallet.publicKeyAddress
+                toHtml(html.payTransaction.render(publicKeyAddress,
+                                                  getQRCode(publicKeyAddress)))
+            }
+          } ~ pathPrefix("sender") {
+            path("status") {
+              handleStatus(rawSessionWallet, "funded", isHtml = true) {
+                sessionWallet =>
+                  toHtml(html.senderStatus.render())
+              }
+            }
+          } ~ pathPrefix("recipient") {
+            ???
+          } ~ pathPrefix("recover") {
+            path("seed") {
+              ???
+            } ~ path("address") {
+              ???
+            }
+          }
       }
     } ~ pathPrefix("css") {
       getFromDirectory("public/css")

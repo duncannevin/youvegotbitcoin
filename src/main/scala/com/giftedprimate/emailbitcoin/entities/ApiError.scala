@@ -16,4 +16,6 @@ object ApiError {
     new ApiError(StatusCodes.BadRequest, "Session does not exist.")
   def noWalletError: ApiError =
     new ApiError(StatusCodes.BadRequest, "Wallet does not exist.")
+  def unauthorized: ApiError =
+    new ApiError(StatusCodes.Unauthorized, "unauthorized")
 }
