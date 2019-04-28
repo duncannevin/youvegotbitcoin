@@ -1,4 +1,4 @@
-let transactions
+let transactions, currentStatus
 
 class Transaction {
   constructor({time, amount, confirmations, fee, txid}) {
@@ -43,7 +43,8 @@ function handleBlocks (blocks) {
 }
 
 function handleStatus (status) {
-  console.log(status)
+  if (currentStatus && currentStatus !== status) window.location.reload()
+  currentStatus = status
 }
 
 connectStatus(handleBlocks, handleStatus)

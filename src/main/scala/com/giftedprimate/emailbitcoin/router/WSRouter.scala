@@ -23,7 +23,7 @@ class WSRouter @Inject()(
     sessionDAO: SessionDAO,
     actorSystem: ActorSystem,
     bitcoinClient: BitcoinClient,
-    recipientWalletDAO: RecipientWalletDAO
+    recipientWalletDAO: RecipientWalletDAO,
 ) extends PartialRoute
     with EBDirectives {
   override def router: Route = pathPrefix("ws") {
@@ -36,7 +36,8 @@ class WSRouter @Inject()(
                 StatusActor.props(sessionWallet.session,
                                   ebTransactionDAO,
                                   bitcoinClient,
-                                  recipientWalletDAO))
+                                  recipientWalletDAO,
+                                  sessionDAO))
             val futureFlow = (transactionStatusActor ? GetActorFlow())
               .mapTo[Flow[Message, Message, _]]
             onComplete(futureFlow) {

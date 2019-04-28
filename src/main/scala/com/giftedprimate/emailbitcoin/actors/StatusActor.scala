@@ -1,19 +1,13 @@
 package com.giftedprimate.emailbitcoin.actors
 
-import akka.actor.{Actor, Props}
+import akka.actor.Props
 import com.giftedprimate.emailbitcoin.bitcoin.BitcoinClient
 import com.giftedprimate.emailbitcoin.daos.{
   EBTransactionDAO,
-  RecipientWalletDAO
+  RecipientWalletDAO,
+  SessionDAO
 }
-import com.giftedprimate.emailbitcoin.entities.{
-  EBBlock,
-  EBTransaction,
-  Session,
-  TransactionStatus,
-  UnrecognizedMsgException,
-  WSRequest
-}
+import com.giftedprimate.emailbitcoin.entities._
 import com.giftedprimate.emailbitcoin.websocket.WSConvertFlow
 import io.circe.syntax._
 import javax.inject.Inject
@@ -27,8 +21,13 @@ object StatusActor {
   def props(session: Session,
             transactionDAO: EBTransactionDAO,
             bitcoinClient: BitcoinClient,
-            recipientWalletDAO: RecipientWalletDAO): Props = Props(
-    new StatusActor(session, transactionDAO, bitcoinClient, recipientWalletDAO)
+            recipientWalletDAO: RecipientWalletDAO,
+            sessionDAO: SessionDAO): Props = Props(
+    new StatusActor(session,
+                    transactionDAO,
+                    bitcoinClient,
+                    recipientWalletDAO,
+                    sessionDAO)
   )
 }
 
@@ -36,7 +35,8 @@ class StatusActor @Inject()(
     session: Session,
     transactionDAO: EBTransactionDAO,
     bitcoinClient: BitcoinClient,
-    recipientWalletDAO: RecipientWalletDAO
+    recipientWalletDAO: RecipientWalletDAO,
+    sessionDAO: SessionDAO
 ) extends WSConvertFlow {
   import StatusActor._
   import io.circe.generic.auto._
@@ -50,6 +50,9 @@ class StatusActor @Inject()(
   override def websocketReceive: Receive = {
     case StatusCheck() =>
       for {
+        currentStatus <- sessionDAO
+          .find(session.sessionId)
+          .map(_.map(_.status).getOrElse(session.status))
         transactions <- transactionDAO.findAll(session.publicKey)
         blocks = transactions.map { transaction =>
           val block = bitcoinClient.getRawTransaction(transaction.transactionId)
@@ -58,7 +61,7 @@ class StatusActor @Inject()(
             .copy(time = transaction.createdAt)
         }
       } yield {
-        out ! TransactionStatus(session.sessionId, session.status, blocks).asJson
+        out ! TransactionStatus(session.sessionId, currentStatus, blocks).asJson
           .toString()
       }
     case _ => out ! "not something I understand"
