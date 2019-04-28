@@ -11,7 +11,6 @@ import com.giftedprimate.emailbitcoin.validators.{
 }
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
-import com.github.scala_opennode._
 
 @Singleton
 class HomeRouter @Inject()(
