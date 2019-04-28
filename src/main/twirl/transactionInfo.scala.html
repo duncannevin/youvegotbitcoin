@@ -1,0 +1,30 @@
+@import com.giftedprimate.emailbitcoin.entities.Session
+@import com.giftedprimate.emailbitcoin.entities.RecipientWallet
+@(session: Session, wallet: RecipientWallet)()
+
+<div id="Transaction-info" class="col">
+    <table class="row status-table">
+        <tbody>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>TxId</th>
+                <th>Conf</th>
+                <th>Fee</th>
+                <th>Amt</th>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <div class="row ">
+        <p>
+            This gift has@if(session.status == "funded" | session.status == "pending") {
+            <em class="underline red-text">not</em>&nbsp;been claimed yet.
+            } else if (session.status == "reclaimed") {
+            been&nbsp;<em class="underline green-text">reclaimed</em>&nbsp;by you.
+            } else {
+            been&nbsp;<em class="underline green-text">claimed</em>.
+            }
+        </p>
+    </div>
+</div>

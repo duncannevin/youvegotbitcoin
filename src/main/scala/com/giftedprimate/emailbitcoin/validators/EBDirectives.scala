@@ -64,8 +64,9 @@ trait EBDirectives extends Directives with ClientDirectives {
                    desiredStatus: String,
                    isHtml: Boolean = false): Directive1[SessionWallet] =
     sessionWallet.session.status match {
-      case status if status == desiredStatus => provide(sessionWallet)
-      case status if status != desiredStatus => toHtml(html.badRequest.render())
+      case status if desiredStatus.contains(status) => provide(sessionWallet)
+      case status if !desiredStatus.contains(status) =>
+        toHtml(html.badRequest.render())
       case _ =>
         if (isHtml) {
           toHtml(html.serverError.render())

@@ -13,6 +13,7 @@ import com.giftedprimate.emailbitcoin.entities
 import com.giftedprimate.emailbitcoin.entities.{
   CreationForm,
   EBBlock,
+  RawBlock,
   RecipientWallet
 }
 import com.giftedprimate.emailbitcoin.loggers.BitcoinLogger
@@ -120,7 +121,8 @@ class BitcoinClient @Inject()(
 
   def getRawTransaction(txId: String): Option[EBBlock] = {
     val raw = s"bitcoin-cli gettransaction $txId".!!
-    parse(raw).right.toOption.flatMap(_.as[EBBlock].right.toOption)
+    parse(raw).right.toOption
+      .flatMap(_.as[RawBlock].right.toOption.map(EBBlock.apply))
   }
 
   private def addExistingWallets(wallets: Seq[RecipientWallet]): Seq[Unit] =

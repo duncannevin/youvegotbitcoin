@@ -1,6 +1,11 @@
-@()(content: Html)
+@import com.giftedprimate.emailbitcoin.entities.CreationForm
+@(creationForm: CreationForm)(content: Html)
 
 @index() {
-  <div>SENDER</div>
-  <div>@content</div>
+  <div class="col">
+    <div class="row">
+      <div class="row lg-text underline"><strong>Hello</strong>, &nbsp; <em>@creationForm.senderEmail</em></div>
+    </div>
+    <div class="row">@content</div>
+  </div>
 }

@@ -1,6 +1,8 @@
 package com.giftedprimate.emailbitcoin.entities
 
 object TransactionStatus {}
-case class TransactionStatus(sessionId: String,
-                             transactions: Seq[EBTransaction],
-                             blocks: Seq[EBBlock])
+case class TransactionStatus(
+    sessionId: String,
+    status: String,
+    blocks: Seq[EBBlock]
+)

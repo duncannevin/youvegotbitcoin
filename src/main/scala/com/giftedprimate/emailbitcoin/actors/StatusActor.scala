@@ -4,6 +4,8 @@ import akka.actor.{Actor, Props}
 import com.giftedprimate.emailbitcoin.bitcoin.BitcoinClient
 import com.giftedprimate.emailbitcoin.daos.EBTransactionDAO
 import com.giftedprimate.emailbitcoin.entities.{
+  EBBlock,
+  EBTransaction,
   Session,
   TransactionStatus,
   UnrecognizedMsgException,
@@ -15,23 +17,23 @@ import javax.inject.Inject
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object TransactionStatusActor {
+object StatusActor {
   final case class GetTransactionStatus(sessionId: String)
   final case class StatusCheck()
 
   def props(session: Session,
             transactionDAO: EBTransactionDAO,
             bitcoinClient: BitcoinClient): Props = Props(
-    new TransactionStatusActor(session, transactionDAO, bitcoinClient)
+    new StatusActor(session, transactionDAO, bitcoinClient)
   )
 }
 
-class TransactionStatusActor @Inject()(
+class StatusActor @Inject()(
     session: Session,
     transactionDAO: EBTransactionDAO,
     bitcoinClient: BitcoinClient
 ) extends WSConvertFlow {
-  import TransactionStatusActor._
+  import StatusActor._
   import io.circe.generic.auto._
 
   override def convert(wsRequest: WSRequest): Any = wsRequest match {
@@ -44,11 +46,14 @@ class TransactionStatusActor @Inject()(
     case StatusCheck() =>
       for {
         transactions <- transactionDAO.findAll(session.publicKey)
-        blocks = transactions.flatMap { transaction =>
-          bitcoinClient.getRawTransaction(transaction.transactionId)
+        blocks = transactions.map { transaction =>
+          val block = bitcoinClient.getRawTransaction(transaction.transactionId)
+          block
+            .getOrElse(EBBlock(transaction))
+            .copy(time = transaction.createdAt)
         }
       } yield {
-        out ! TransactionStatus(session.sessionId, transactions, blocks).asJson
+        out ! TransactionStatus(session.sessionId, session.status, blocks).asJson
           .toString()
       }
     case _ => out ! "not something I understand"

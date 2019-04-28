@@ -1,5 +1,13 @@
-@()()
+@import com.giftedprimate.emailbitcoin.entities.Session
+@import com.giftedprimate.emailbitcoin.entities.RecipientWallet
+@()(session: Session, wallet: RecipientWallet)
 
-@sender() {
-  <div>STATUS</div>
+@sender(wallet.createForm) {
+  <div class="col">
+    <br>
+    <div class="row">You sent the following transactions to &nbsp; <em class="underline">@wallet.createForm.recipientEmail</em></div>
+    <br>
+    @transactionInfo(session, wallet)
+  </div>
+  <script src="/js/status.js"></script>
 }

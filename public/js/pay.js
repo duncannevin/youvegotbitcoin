@@ -19,12 +19,12 @@ $(function () {
   $payCopy.on('click', copyCode)
 })
 
-function handleBlocks (blocks) {}
-
-function handleTransactions (transactions) {
-  if (transactions.length) {
+function handleBlocks (blocks) {
+  if (blocks.length) {
     window.location = window.location.href.replace('pay', 'sender/status')
   }
 }
 
-connectStatus(handleBlocks, handleTransactions)
+function handleStatus (status) {}
+
+connectStatus(handleBlocks, handleStatus)

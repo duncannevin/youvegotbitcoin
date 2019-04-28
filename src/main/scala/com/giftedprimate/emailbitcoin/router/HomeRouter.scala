@@ -37,24 +37,26 @@ class HomeRouter @Inject()(
               sessionWallet =>
                 val publicKeyAddress =
                   sessionWallet.recipientWallet.publicKeyAddress
-                toHtml(html.payTransaction.render(publicKeyAddress,
-                                                  getQRCode(publicKeyAddress)))
+                toHtml(html.pay.render(publicKeyAddress,
+                                       getQRCode(publicKeyAddress)))
             }
-          } ~ handleStatus(rawSessionWallet, "funded", isHtml = true) {
-            sessionWallet =>
-              pathPrefix("sender") {
-                path("status") {
-                  toHtml(html.senderStatus.render())
-                }
-              } ~ pathPrefix("recipient") {
-                ???
-              } ~ pathPrefix("recover") {
-                path("seed") {
-                  ???
-                } ~ path("address") {
-                  ???
-                }
+          } ~ handleStatus(rawSessionWallet,
+                           "funded reclaimed received",
+                           isHtml = true) { sessionWallet =>
+            pathPrefix("sender") {
+              path("status") {
+                toHtml(html.senderStatus.render(sessionWallet.session,
+                                                sessionWallet.recipientWallet))
               }
+            } ~ pathPrefix("recipient") {
+              ???
+            } ~ pathPrefix("recover") {
+              path("seed") {
+                ???
+              } ~ path("address") {
+                ???
+              }
+            }
           }
       }
     } ~ pathPrefix("css") {

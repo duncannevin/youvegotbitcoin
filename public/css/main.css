@@ -11,3 +11,42 @@ html, body {}
 p, h1 {
     display: inline-block;
 }
+
+.lg-text {
+    font-size: 24px;
+}
+
+.underline {
+    border-bottom: 1px solid #000000;
+}
+
+.status-table {}
+
+.green-text {
+    color: green;
+}
+
+.red-text {
+    color: red;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    text-align: left;
+    border: 1px solid black;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+td {
+    max-width: 200px;
+    overflow: hidden;
+}
