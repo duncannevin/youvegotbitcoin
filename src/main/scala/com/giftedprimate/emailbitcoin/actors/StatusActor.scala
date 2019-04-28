@@ -2,7 +2,10 @@ package com.giftedprimate.emailbitcoin.actors
 
 import akka.actor.{Actor, Props}
 import com.giftedprimate.emailbitcoin.bitcoin.BitcoinClient
-import com.giftedprimate.emailbitcoin.daos.EBTransactionDAO
+import com.giftedprimate.emailbitcoin.daos.{
+  EBTransactionDAO,
+  RecipientWalletDAO
+}
 import com.giftedprimate.emailbitcoin.entities.{
   EBBlock,
   EBTransaction,
@@ -23,15 +26,17 @@ object StatusActor {
 
   def props(session: Session,
             transactionDAO: EBTransactionDAO,
-            bitcoinClient: BitcoinClient): Props = Props(
-    new StatusActor(session, transactionDAO, bitcoinClient)
+            bitcoinClient: BitcoinClient,
+            recipientWalletDAO: RecipientWalletDAO): Props = Props(
+    new StatusActor(session, transactionDAO, bitcoinClient, recipientWalletDAO)
   )
 }
 
 class StatusActor @Inject()(
     session: Session,
     transactionDAO: EBTransactionDAO,
-    bitcoinClient: BitcoinClient
+    bitcoinClient: BitcoinClient,
+    recipientWalletDAO: RecipientWalletDAO
 ) extends WSConvertFlow {
   import StatusActor._
   import io.circe.generic.auto._

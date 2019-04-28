@@ -31,6 +31,7 @@ import org.bitcoinj.store.{BlockStore, MemoryBlockStore}
 import org.bitcoinj.utils.BriefLogFormatter
 import org.bitcoinj.wallet.listeners.WalletCoinsReceivedEventListener
 import org.bitcoinj.wallet.{DeterministicSeed, Wallet}
+import scala.collection.JavaConverters._
 
 import sys.process._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -125,14 +126,18 @@ class BitcoinClient @Inject()(
       .flatMap(_.as[RawBlock].right.toOption.map(EBBlock.apply))
   }
 
+  private def makeWallet(recipientWallet: RecipientWallet): Wallet = {
+    val creationTime: Long = 1409478661L
+    val seed: DeterministicSeed =
+      new DeterministicSeed(recipientWallet.seed, null, "", creationTime)
+    Wallet.fromSeed(params, seed, Script.ScriptType.P2PKH)
+  }
+
   private def addExistingWallets(wallets: Seq[RecipientWallet]): Seq[Unit] =
     for {
       recipientWallet <- wallets
     } yield {
-      val creationTime: Long = 1409478661L
-      val seed: DeterministicSeed =
-        new DeterministicSeed(recipientWallet.seed, null, "", creationTime)
-      val wallet = Wallet.fromSeed(params, seed, Script.ScriptType.P2PKH)
+      val wallet = makeWallet(recipientWallet)
       wallet.setDescription(
         s"for: ${recipientWallet.createForm.recipientEmail} from ${recipientWallet.createForm.senderEmail}"
       )
