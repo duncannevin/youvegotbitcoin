@@ -3,18 +3,27 @@
 @(session: Session, wallet: RecipientWallet)()
 
 <div id="Transaction-info" class="col">
-    <table class="row status-table">
-        <tbody>
-            <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>TxId</th>
-                <th>Conf</th>
-                <th>Fee</th>
-                <th>Amt</th>
-            </tr>
-        </tbody>
-    </table>
+    <div class="row">
+        <table class="status-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>TxId</th>
+                    <th>Conf</th>
+                    <th>Fee</th>
+                    <th>Amt</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr><td><td><td><td><td>Total</td><td id="status-total">0</td></tr>
+                <tr><td><td><td><td><td>Fees</td><td id="status-fees">0</td></tr>
+                <tr><td><td><td><td><td>Sum</td><td id="status-sum">0</td></tr>
+            </tfoot>
+        </table>
+    </div>
     <br>
     <div class="row ">
         <p>

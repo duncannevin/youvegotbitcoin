@@ -37,9 +37,9 @@ table {
 }
 
 td, th {
-    text-align: left;
     border: 1px solid black;
     padding: 8px;
+    text-align: right;
 }
 
 tr:nth-child(even) {
@@ -49,4 +49,25 @@ tr:nth-child(even) {
 td {
     max-width: 200px;
     overflow: hidden;
+}
+
+.status-table tr td:last-child {
+    color: green;
+}
+
+.status-table tbody tr td:nth-child(5):not(:last-child) {
+    color: red;
+}
+
+.status-table tfoot tr td:not(:last-child):not(:nth-child(5)) {
+    border: none;
+    background-color: transparent;
+}
+
+.status-table tfoot tr:nth-child(2)  td:nth-child(n+6) {
+    color: red;
+}
+
+.status-table tfoot tr {
+    background-color: transparent;
 }

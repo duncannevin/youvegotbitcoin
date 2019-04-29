@@ -50,11 +50,8 @@ class HomeRouter @Inject()(
             } ~ pathPrefix("recipient") {
               ???
             } ~ pathPrefix("recover") {
-              path("seed") {
-                ???
-              } ~ path("address") {
-                ???
-              }
+              toHtml(html.recover.render(sessionWallet.session,
+                                         sessionWallet.recipientWallet))
             }
           }
       }

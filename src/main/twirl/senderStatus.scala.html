@@ -8,6 +8,12 @@
     <div class="row">You sent the following transactions to &nbsp; <em class="underline">@wallet.createForm.recipientEmail</em></div>
     <br>
     @transactionInfo(session, wallet)
+    <div class="row">
+      @if(session.status == "funded") {
+        <a href="/recover?sessionid=${session.sessionId}" class="underline">Recover these funds</a>
+      }
+    </div>
+    <br>
   </div>
   <script src="/js/status.js"></script>
 }

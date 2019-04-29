@@ -13,8 +13,13 @@ class Transaction {
 class Transactions {
   constructor(blocks) {
     this.list = blocks.map(block => new Transaction(block))
+    this.sum = this.list.reduce((sum, transaction) => {
+      sum.total += transaction.amount
+      sum.minusFees += (transaction.amount - transaction.fee)
+      sum.fees += transaction.fee
+      return sum
+    }, {total: 0, minusFees: 0, fees: 0})
     this._render()
-    console.log(this.list)
   }
 
   $TransactionInfo = $('#Transaction-info')
@@ -24,6 +29,7 @@ class Transactions {
     this.list.forEach((transaction, ind) => {
       const rowId = 'Status-row-' + ind
       $('#' + rowId).remove()
+      $('#status-table-footer').remove()
       const dateNTime = parseDate(transaction.time)
       const $row = $('<tr id="' + rowId + '">')
       const $date = '<td>' + dateNTime[0] + '</td>'
@@ -34,6 +40,9 @@ class Transactions {
       const $amt = '<td>' + transaction.amount + '</td>'
       $row.append($date + $time + $txId + $conf + $fee + $amt)
       this.$infoTable.append($row)
+      $('#status-total').empty().append(this.sum.total)
+      $('#status-fees').empty().append('-' + this.sum.fees)
+      $('#status-sum').empty().append(this.sum.minusFees)
     })
   }
 }
