@@ -10,7 +10,7 @@
     @transactionInfo(session, wallet)
     <div class="row">
       @if(session.status == "funded") {
-        <a href="/recover?sessionid=${session.sessionId}" class="underline">Recover these funds</a>
+        <a href="/recover?sessionid=@{session.sessionId}" class="underline">Recover these funds</a>
       }
     </div>
     <br>
