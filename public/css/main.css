@@ -68,6 +68,10 @@ td {
     color: red;
 }
 
+.status-table tfoot tr:last-child td:last-child {
+    text-decoration: underline;
+}
+
 .status-table tfoot tr {
     background-color: transparent;
 }
