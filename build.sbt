@@ -1,6 +1,6 @@
 enablePlugins(JavaAppPackaging, AshScriptPlugin)
 
-name := "emailbitcoin"
+name := "emailbtc"
 
 version := "0.1"
 
