@@ -29,31 +29,28 @@ class HomeRouter @Inject()(
         toHtml(html.createTransaction.render())
       }
     } ~ parameter('sessionid) { sessionId =>
-      handleSessionWallet(sessionDAO.findWithWallet(sessionId), isHtml = true) {
-        rawSessionWallet =>
+      handleSession(sessionDAO.find(sessionId)) { session =>
+        handleWallet(recipientWalletDAO.find(session.publicKey)) { wallet =>
           pathPrefix("pay") {
-            handleStatus(rawSessionWallet, "pending", isHtml = true) {
-              sessionWallet =>
-                val publicKeyAddress =
-                  sessionWallet.recipientWallet.publicKeyAddress
-                toHtml(html.pay.render(publicKeyAddress,
-                                       getQRCode(publicKeyAddress)))
+            handleStatus(session, "pending", isHtml = true) { _ =>
+              val publicKeyAddress =
+                wallet.publicKeyAddress
+              toHtml(
+                html.pay.render(publicKeyAddress, getQRCode(publicKeyAddress)))
             }
-          } ~ handleStatus(rawSessionWallet,
-                           "funded reclaimed received",
-                           isHtml = true) { sessionWallet =>
-            pathPrefix("sender") {
-              path("status") {
-                toHtml(html.senderStatus.render(sessionWallet.session,
-                                                sessionWallet.recipientWallet))
+          } ~ handleStatus(session, "funded reclaimed received", isHtml = true) {
+            _ =>
+              pathPrefix("sender") {
+                path("status") {
+                  toHtml(html.senderStatus.render(session, wallet))
+                }
+              } ~ pathPrefix("recipient") {
+                ???
+              } ~ pathPrefix("recover") {
+                toHtml(html.recover.render(session, wallet))
               }
-            } ~ pathPrefix("recipient") {
-              ???
-            } ~ pathPrefix("recover") {
-              toHtml(html.recover.render(sessionWallet.session,
-                                         sessionWallet.recipientWallet))
-            }
           }
+        }
       }
     } ~ pathPrefix("css") {
       getFromDirectory("public/css")

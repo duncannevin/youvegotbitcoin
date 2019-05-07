@@ -29,21 +29,20 @@ class WSRouter @Inject()(
   override def router: Route = pathPrefix("ws") {
     path("status") {
       parameter("sessionid") { sessionId =>
-        handleSessionWallet(sessionDAO.findWithWallet(sessionId)) {
-          sessionWallet =>
-            val transactionStatusActor =
-              actorSystem.actorOf(
-                StatusActor.props(sessionWallet.session,
-                                  ebTransactionDAO,
-                                  bitcoinClient,
-                                  recipientWalletDAO,
-                                  sessionDAO))
-            val futureFlow = (transactionStatusActor ? GetActorFlow())
-              .mapTo[Flow[Message, Message, _]]
-            onComplete(futureFlow) {
-              case Success(flow)      => handleWebSocketMessages(flow)
-              case Failure(exception) => complete(exception.getMessage)
-            }
+        handleSession(sessionDAO.find(sessionId)) { session =>
+          val transactionStatusActor =
+            actorSystem.actorOf(
+              StatusActor.props(session,
+                                ebTransactionDAO,
+                                bitcoinClient,
+                                recipientWalletDAO,
+                                sessionDAO))
+          val futureFlow = (transactionStatusActor ? GetActorFlow())
+            .mapTo[Flow[Message, Message, _]]
+          onComplete(futureFlow) {
+            case Success(flow)      => handleWebSocketMessages(flow)
+            case Failure(exception) => complete(exception.getMessage)
+          }
         }
       }
     }

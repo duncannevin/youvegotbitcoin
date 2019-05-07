@@ -21,23 +21,12 @@ trait EBDirectives extends Directives with ClientDirectives {
   def handleWithGeneric[T](f: Future[T]): Directive1[T] =
     handle(f)(_ => ApiError.generic)
 
-  def handleSessionWallet[T](
-      f: Future[T],
-      isHtml: Boolean = false): Directive1[SessionWallet] = {
+  def handleSession[T](f: Future[T],
+                       isHtml: Boolean = false): Directive1[Session] =
     onComplete(f) flatMap {
       case Success(t) =>
         t match {
-          case (Some(session: Session), None) =>
-            logger.sessionHasNoWallet(session)
-            if (isHtml) {
-              toHtml(html.serverError.render())
-            } else {
-              complete(ApiError.noWalletError.statusCode,
-                       ApiError.noWalletError.message)
-            }
-          case (Some(session: Session),
-                Some(recipientWallet: RecipientWallet)) =>
-            provide(SessionWallet(session, recipientWallet))
+          case Some(session: Session) => provide(session)
           case _ =>
             logger.unknownReason
             if (isHtml) {
@@ -47,16 +36,33 @@ trait EBDirectives extends Directives with ClientDirectives {
                        ApiError.noSessionError.message)
             }
         }
-      case Failure(error) =>
+      case Failure(_) =>
         complete(ApiError.generic.statusCode, ApiError.generic.message)
     }
-  }
 
-  def handleStatus(sessionWallet: SessionWallet,
+  def handleWallet[T](f: Future[T],
+                      isHtml: Boolean = false): Directive1[RecipientWallet] =
+    onComplete(f) flatMap {
+      case Success(t) =>
+        t match {
+          case Some(wallet: RecipientWallet) => provide(wallet)
+          case _ =>
+            if (isHtml) {
+              toHtml(html.badRequest())
+            } else {
+              complete(ApiError.noWalletError.statusCode,
+                       ApiError.noWalletError.message)
+            }
+        }
+      case Failure(_) =>
+        complete(ApiError.generic.statusCode, ApiError.generic.message)
+    }
+
+  def handleStatus(session: Session,
                    desiredStatus: String,
-                   isHtml: Boolean = false): Directive1[SessionWallet] =
-    sessionWallet.session.status match {
-      case status if desiredStatus.contains(status) => provide(sessionWallet)
+                   isHtml: Boolean = false): Directive1[Session] =
+    session.status match {
+      case status if desiredStatus.contains(status) => provide(session)
       case status if !desiredStatus.contains(status) =>
         toHtml(html.badRequest.render())
       case _ =>
