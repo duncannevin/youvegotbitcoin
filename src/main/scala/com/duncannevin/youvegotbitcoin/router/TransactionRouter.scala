@@ -17,7 +17,9 @@ import com.duncannevin.youvegotbitcoin.validators.{
 }
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import javax.inject.Singleton
 
+@Singleton
 class TransactionRouter @Inject()(
     @Named("new-wallet-actor") newWalletActor: ActorRef,
     implicit val actorSystem: ActorSystem

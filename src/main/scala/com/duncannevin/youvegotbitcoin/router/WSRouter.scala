@@ -2,7 +2,7 @@ package com.duncannevin.youvegotbitcoin.router
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.ws.Message
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{Directives, Route}
 import akka.pattern.ask
 import akka.stream.scaladsl.Flow
 import com.duncannevin.youvegotbitcoin.actors.StatusActor
@@ -13,11 +13,17 @@ import com.duncannevin.youvegotbitcoin.daos.{
   SessionDAO
 }
 import com.duncannevin.youvegotbitcoin.entities.{ApiError, GetActorFlow}
-import com.duncannevin.youvegotbitcoin.validators.EBDirectives
+import com.duncannevin.youvegotbitcoin.validators.{
+  ClientDirectives,
+  EBDirectives,
+  ValidatorDirectives
+}
 import com.google.inject.Inject
+import javax.inject.Singleton
 
 import scala.util.{Failure, Success}
 
+@Singleton
 class WSRouter @Inject()(
     ebTransactionDAO: EBTransactionDAO,
     sessionDAO: SessionDAO,
@@ -25,9 +31,12 @@ class WSRouter @Inject()(
     bitcoinClient: BitcoinClient,
     recipientWalletDAO: RecipientWalletDAO,
 ) extends PartialRoute
-    with EBDirectives {
+    with Directives
+    with EBDirectives
+    with ValidatorDirectives
+    with ClientDirectives {
   override def router: Route = pathPrefix("ws") {
-    path("status") {
+    pathPrefix("status") {
       parameter('sessionid) { sessionId =>
         handleSession(sessionDAO.find(sessionId)) { session =>
           val transactionStatusActor = actorSystem.actorOf(

@@ -7,5 +7,5 @@ class Routes @Inject()(
     transactionRouter: TransactionRouter,
     WSRouter: WSRouter
 ) {
-  def routes: Seq[PartialRoute] = Seq(homeRouter, transactionRouter, WSRouter)
+  def routes: Seq[PartialRoute] = Seq(WSRouter, homeRouter, transactionRouter)
 }
