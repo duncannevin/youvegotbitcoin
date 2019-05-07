@@ -12,7 +12,7 @@ import com.duncannevin.youvegotbitcoin.daos.{
   RecipientWalletDAO,
   SessionDAO
 }
-import com.duncannevin.youvegotbitcoin.entities.GetActorFlow
+import com.duncannevin.youvegotbitcoin.entities.{ApiError, GetActorFlow}
 import com.duncannevin.youvegotbitcoin.validators.EBDirectives
 import com.google.inject.Inject
 
@@ -28,20 +28,23 @@ class WSRouter @Inject()(
     with EBDirectives {
   override def router: Route = pathPrefix("ws") {
     path("status") {
-      parameter("sessionid") { sessionId =>
+      parameter('sessionid) { sessionId =>
         handleSession(sessionDAO.find(sessionId)) { session =>
-          val transactionStatusActor =
-            actorSystem.actorOf(
-              StatusActor.props(session,
-                                ebTransactionDAO,
-                                bitcoinClient,
-                                recipientWalletDAO,
-                                sessionDAO))
+          val transactionStatusActor = actorSystem.actorOf(
+            StatusActor.props(
+              session,
+              ebTransactionDAO,
+              bitcoinClient,
+              recipientWalletDAO,
+              sessionDAO
+            )
+          )
           val futureFlow = (transactionStatusActor ? GetActorFlow())
             .mapTo[Flow[Message, Message, _]]
           onComplete(futureFlow) {
-            case Success(flow)      => handleWebSocketMessages(flow)
-            case Failure(exception) => complete(exception.getMessage)
+            case Success(flow) => handleWebSocketMessages(flow)
+            case Failure(_) =>
+              complete(ApiError.generic.statusCode, ApiError.generic.message)
           }
         }
       }

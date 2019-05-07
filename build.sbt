@@ -5,7 +5,7 @@ name := "youvegotbitcoin"
 version := "0.1"
 
 dockerBaseImage := "openjdk:8-jre-alpine"
-packageName in Docker := "akkahttp-quickstart"
+packageName in Docker := "youvegotbitcoin"
 
 val akkaVersion = "2.5.13"
 val akkaHttpVersion = "10.1.3"
@@ -55,4 +55,4 @@ libraryDependencies ++= Seq(
   "com.github.giftedprimate" %% "scala_opennode" % "0.3"
 )
 
-mainClass in Global := Some("com.giftedprimate.emailbitcoin.Main")
+mainClass in Global := Some("com.duncannevin.youvegotbitcoin.Main")

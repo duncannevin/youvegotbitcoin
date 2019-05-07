@@ -26,7 +26,8 @@ trait EBDirectives extends Directives with ClientDirectives {
     onComplete(f) flatMap {
       case Success(t) =>
         t match {
-          case Some(session: Session) => provide(session)
+          case Some(session: Session) =>
+            provide(session)
           case _ =>
             logger.unknownReason
             if (isHtml) {
