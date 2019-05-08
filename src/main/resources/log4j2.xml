@@ -19,7 +19,7 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="com.giftedprimate.emailbitcoin" level="info" additivity="true">
+        <Logger name="com.duncannevin.youvegotbitcoin" level="info" additivity="true">
             <appender-ref ref="fileLogger" level="info" />
         </Logger>
         <Root level="info" additivity="false">
